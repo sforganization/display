@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".HongKong">
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/frameLayout10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:ignore="MissingConstraints">
+
+        <ImageView
+            android:id="@+id/finger_background"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            app:srcCompat="@drawable/background"
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="0dp" />
+
+        <Button
+            android:id="@+id/Hongkong1_trun"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="100dp"
+            android:layout_marginLeft="100dp"
+            android:layout_marginTop="160dp"
+            android:background="@drawable/trywear"
+            android:textSize="32dp"
+            android:text="转/停"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/Hongkong2_up"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="200dp"
+            android:layout_marginLeft="200dp"
+            android:layout_marginTop="160dp"
+            android:background="@drawable/trywear"
+            android:textSize="32dp"
+            android:text="上升"
+            app:layout_constraintStart_toEndOf="@+id/Hongkong1_trun"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/Hongkong2_down"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="80dp"
+            android:background="@drawable/trywear"
+            android:textSize="32dp"
+            android:text="下降"
+            app:layout_constraintStart_toStartOf="@+id/Hongkong2_up"
+            app:layout_constraintTop_toBottomOf="@+id/Hongkong2_up" />
+
+        <include
+            android:id="@+id/Hongkong3_mode"
+            layout="@layout/include_function"
+            android:layout_width="109dp"
+            android:layout_height="109dp"
+            android:layout_marginStart="100dp"
+            android:layout_marginLeft="100dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toEndOf="@+id/view2"
+            app:layout_constraintTop_toTopOf="@+id/Hongkong2_up" />
+
+        <include
+            android:id="@+id/hongkong1_lock"
+            layout="@layout/include_lock"
+            android:layout_width="109dp"
+            android:layout_height="109dp"
+            android:layout_marginStart="50dp"
+            android:layout_marginLeft="50dp"
+            android:layout_marginTop="260dp"
+            app:layout_constraintStart_toStartOf="@+id/Hongkong1_trun"
+            app:layout_constraintTop_toBottomOf="@+id/Hongkong1_trun" />
+
+        <include
+            android:id="@+id/hongkong2_lock"
+            layout="@layout/include_lock"
+            android:layout_width="109dp"
+            android:layout_height="109dp"
+            android:layout_marginStart="50dp"
+            android:layout_marginLeft="50dp"
+            android:layout_marginTop="100dp"
+            app:layout_constraintStart_toStartOf="@+id/Hongkong2_down"
+            app:layout_constraintTop_toBottomOf="@+id/Hongkong2_down" />
+
+        <include
+            android:id="@+id/hongkong3_lock"
+            layout="@layout/include_lock"
+            android:layout_width="109dp"
+            android:layout_height="109dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/hongkong2_lock"
+            app:layout_constraintStart_toStartOf="@+id/Hongkong3_mode" />
+
+        <ProgressBar
+            android:id="@+id/hongkong1_process"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:clickable="false"
+            android:indeterminateDrawable="@drawable/loading"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@+id/hongkong1_lock"
+            app:layout_constraintEnd_toEndOf="@+id/hongkong1_lock"
+            app:layout_constraintStart_toStartOf="@+id/hongkong1_lock"
+            app:layout_constraintTop_toTopOf="@+id/hongkong1_lock" />
+
+
+        <ProgressBar
+            android:id="@+id/hongkong2_process"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:clickable="false"
+            android:indeterminateDrawable="@drawable/loading"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@+id/hongkong2_lock"
+            app:layout_constraintEnd_toEndOf="@+id/hongkong2_lock"
+            app:layout_constraintStart_toStartOf="@+id/hongkong2_lock"
+            app:layout_constraintTop_toTopOf="@+id/hongkong2_lock" />
+
+        <ProgressBar
+            android:id="@+id/hongkong3_process"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:clickable="false"
+            android:indeterminateDrawable="@drawable/loading"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@+id/hongkong3_lock"
+            app:layout_constraintEnd_toEndOf="@+id/hongkong3_lock"
+            app:layout_constraintStart_toStartOf="@+id/hongkong3_lock"
+            app:layout_constraintTop_toTopOf="@+id/hongkong3_lock"/>
+
+        <View
+            android:id="@+id/view"
+            android:layout_width="3dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="66dp"
+            android:layout_marginLeft="66dp"
+            android:background="#C21BF0"
+            app:layout_constraintStart_toEndOf="@+id/Hongkong1_trun"
+            tools:layout_editor_absoluteY="0dp" />
+
+        <View
+            android:id="@+id/view2"
+            android:layout_width="3dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="66dp"
+            android:layout_marginLeft="66dp"
+            android:background="#C21BF0"
+            app:layout_constraintStart_toEndOf="@+id/Hongkong2_down"
+            tools:layout_editor_absoluteY="0dp" />
+
+    </android.support.constraint.ConstraintLayout>
+</android.support.constraint.ConstraintLayout>
