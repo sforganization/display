@@ -1,4 +1,4 @@
-package com.example.administrator.sanfengnu;
+package com.example.administrator.huineng;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -7,18 +7,17 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Display;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.administrator.huineng.R;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -121,13 +120,13 @@ public class ModeSetActivity extends AppCompatActivity {
         //装填信息
         //时间数据包之前的信息
         terimalPackage[0] = (byte)0xAA;			   //包头
-        terimalPackage[1] = (byte)data[0];         //cmd 命令
-        terimalPackage[2] = (byte)data[1];         //参数0  地址，LED模式，增加删除指纹ID,
-        terimalPackage[3] = (byte)data[2];         //
-        terimalPackage[4] = (byte)data[3];         //
-        terimalPackage[5] = (byte)data[4];         //数据  （锁开关 + 方向 + 时间）
-        terimalPackage[6] = (byte)data[5];         //
-        terimalPackage[7] = (byte)data[6];         //
+        terimalPackage[1] = data[0];         //cmd 命令
+        terimalPackage[2] = data[1];         //参数0  地址，LED模式，增加删除指纹ID,
+        terimalPackage[3] = data[2];         //
+        terimalPackage[4] = data[3];         //
+        terimalPackage[5] = data[4];         //数据  （锁开关 + 方向 + 时间）
+        terimalPackage[6] = data[5];         //
+        terimalPackage[7] = data[6];         //
 
         //计算校验和
         //转化为无符号进行校验
@@ -184,7 +183,7 @@ public class ModeSetActivity extends AppCompatActivity {
         checkSum = 0;
         for(i = 0 ; i < 53; i++) //和校验
         {
-            checkSum += (byte)recvArry[index + i];
+            checkSum += recvArry[index + i];
         }
 
         if(checkSum != (byte)0x55 - 1)
@@ -424,15 +423,14 @@ public class ModeSetActivity extends AppCompatActivity {
                 }
 
                 if(checkBool == true){  //数据有异常，改写后重新写入
-                    ;
                     byte[] glassDataWrite = new byte[50];    //一个完整数据包
 
                     //数据正确，写入文件
                     String filePath_data = "/mnt/sdcard/SanFeng/data/";
                     String fileName_data = "stateInfo";   //保存手表状态信息
 
-                    glassDataWrite = (byte[])glassData.clone();
-                    glassDataWrite[0] = (byte) ((byte)glassDataWrite[0] ^ (byte) 0x80);  //去除最高位
+                    glassDataWrite = glassData.clone();
+                    glassDataWrite[0] = (byte) (glassDataWrite[0] ^ (byte) 0x80);  //去除最高位
                     String str = new String(glassDataWrite);
                     writeTxtToFile(str, filePath_data, fileName_data);
                 }
@@ -606,15 +604,15 @@ public class ModeSetActivity extends AppCompatActivity {
         dir_mode = glassData[2 + 3 * (glass_num) + 1];
         tpd_mode = glassData[2 + 3 * (glass_num) + 2];
 
-       tpd_650      = (Button) findViewById(R.id.modeSet_650);
-       tpd_750      = (Button) findViewById(R.id.modeSet_750);
-       tpd_850      = (Button) findViewById(R.id.modeSet_850);
-       tpd_1000     = (Button) findViewById(R.id.modeSet_1000);
-       tpd_1950     = (Button) findViewById(R.id.modeSet_1950);
-       right_button = (Button) findViewById(R.id.modeSet_R);
-       left_button  = (Button) findViewById(R.id.modeSet_L);
-       right_left   = (Button) findViewById(R.id.modeSet_RL);
-       Button return_button = (Button) findViewById(R.id.modeSet_ruturn);
+       tpd_650      = findViewById(R.id.modeSet_650);
+       tpd_750      = findViewById(R.id.modeSet_750);
+       tpd_850      = findViewById(R.id.modeSet_850);
+       tpd_1000     = findViewById(R.id.modeSet_1000);
+       tpd_1950     = findViewById(R.id.modeSet_1950);
+       right_button = findViewById(R.id.modeSet_R);
+       left_button  = findViewById(R.id.modeSet_L);
+       right_left   = findViewById(R.id.modeSet_RL);
+       Button return_button = findViewById(R.id.modeSet_ruturn);
 
 
         // 3.设置按钮点击事件
@@ -645,7 +643,7 @@ public class ModeSetActivity extends AppCompatActivity {
                 case R.id.modeSet_650:
                     tpd_mode = MOTO_TIME_650;
                     break;
-                case R.id.modeSet_750:;
+                case R.id.modeSet_750:
                     tpd_mode = MOTO_TIME_750;
                     break;
                 case R.id.modeSet_850:
@@ -708,8 +706,8 @@ public class ModeSetActivity extends AppCompatActivity {
 
             temp_bytes[0] = (byte)0x02;       //0x02 更新状状态命令
             temp_bytes[1] = (byte)glass_num; //地址 参数0  地址，LED模式，增加删除指纹ID,
-            temp_bytes[5] = (byte)dir_mode;  //方向
-            temp_bytes[6] = (byte)tpd_mode;  //时间
+            temp_bytes[5] = dir_mode;  //方向
+            temp_bytes[6] = tpd_mode;  //时间
 
             byte[] send = makeStringtoFramePackage(temp_bytes);
             /*串口发送字节*/

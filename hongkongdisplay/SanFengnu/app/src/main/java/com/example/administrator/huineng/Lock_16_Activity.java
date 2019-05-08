@@ -1,11 +1,9 @@
-package com.example.administrator.sanfengnu;
+package com.example.administrator.huineng;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,7 +14,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.Toast;
+
+import com.example.administrator.huineng.R;
 
 import java.io.File;
 import java.io.IOException;
@@ -108,13 +107,13 @@ public class Lock_16_Activity extends AppCompatActivity {
         //装填信息
         //时间数据包之前的信息
         terimalPackage[0] = (byte)0xAA;			   //包头
-        terimalPackage[1] = (byte)data[0];         //cmd 命令
-        terimalPackage[2] = (byte)data[1];         //参数0  地址，LED模式，增加删除指纹ID,
-        terimalPackage[3] = (byte)data[2];         //
-        terimalPackage[4] = (byte)data[3];         //
-        terimalPackage[5] = (byte)data[4];         //数据  （锁开关 + 方向 + 时间）
-        terimalPackage[6] = (byte)data[5];         //
-        terimalPackage[7] = (byte)data[6];         //
+        terimalPackage[1] = data[0];         //cmd 命令
+        terimalPackage[2] = data[1];         //参数0  地址，LED模式，增加删除指纹ID,
+        terimalPackage[3] = data[2];         //
+        terimalPackage[4] = data[3];         //
+        terimalPackage[5] = data[4];         //数据  （锁开关 + 方向 + 时间）
+        terimalPackage[6] = data[5];         //
+        terimalPackage[7] = data[6];         //
 
         //计算校验和
         //转化为无符号进行校验
@@ -206,7 +205,7 @@ public class Lock_16_Activity extends AppCompatActivity {
         checkSum = 0;
         for(i = 0 ; i < 53; i++) //和校验
         {
-            checkSum += (byte)recvArry[index + i];
+            checkSum += recvArry[index + i];
         }
 
         if(checkSum != (byte)0x55 - 1)
@@ -415,103 +414,103 @@ public class Lock_16_Activity extends AppCompatActivity {
     };
     private void initViews() {
         //这是获得include中的控件
-        glassInclude[0] = (View)findViewById(R.id.lock16_glass_01);
-        glassInclude[1] = (View)findViewById(R.id.lock16_glass_02);
-        glassInclude[2] = (View)findViewById(R.id.lock16_glass_03);
-        glassInclude[3] = (View)findViewById(R.id.lock16_glass_04);
-        glassInclude[4] = (View)findViewById(R.id.lock16_glass_05);
-        glassInclude[5] = (View)findViewById(R.id.lock16_glass_06);
-        glassInclude[6] = (View)findViewById(R.id.lock16_glass_07);
-        glassInclude[7] = (View)findViewById(R.id.lock16_glass_08);
-        glassInclude[8] = (View)findViewById(R.id.lock16_glass_09);
-        glassInclude[9] = (View)findViewById(R.id.lock16_glass_10);
-        glassInclude[10] = (View)findViewById(R.id.lock16_glass_11);
-        glassInclude[11] = (View)findViewById(R.id.lock16_glass_12);
-        glassInclude[12] = (View)findViewById(R.id.lock16_glass_13);
-        glassInclude[13] = (View)findViewById(R.id.lock16_glass_14);
-        glassInclude[14] = (View)findViewById(R.id.lock16_glass_15);
+        glassInclude[0] = findViewById(R.id.lock16_glass_01);
+        glassInclude[1] = findViewById(R.id.lock16_glass_02);
+        glassInclude[2] = findViewById(R.id.lock16_glass_03);
+        glassInclude[3] = findViewById(R.id.lock16_glass_04);
+        glassInclude[4] = findViewById(R.id.lock16_glass_05);
+        glassInclude[5] = findViewById(R.id.lock16_glass_06);
+        glassInclude[6] = findViewById(R.id.lock16_glass_07);
+        glassInclude[7] = findViewById(R.id.lock16_glass_08);
+        glassInclude[8] = findViewById(R.id.lock16_glass_09);
+        glassInclude[9] = findViewById(R.id.lock16_glass_10);
+        glassInclude[10] = findViewById(R.id.lock16_glass_11);
+        glassInclude[11] = findViewById(R.id.lock16_glass_12);
+        glassInclude[12] = findViewById(R.id.lock16_glass_13);
+        glassInclude[13] = findViewById(R.id.lock16_glass_14);
+        glassInclude[14] = findViewById(R.id.lock16_glass_15);
         //获取include中的子控件
-        glassOpenLock[0] = (Button)glassInclude[0] .findViewById(R.id.include_open_lock_button);
-        glassOpenLock[1] = (Button)glassInclude[1] .findViewById(R.id.include_open_lock_button);
-        glassOpenLock[2] = (Button)glassInclude[2] .findViewById(R.id.include_open_lock_button);
-        glassOpenLock[3] = (Button)glassInclude[3] .findViewById(R.id.include_open_lock_button);
-        glassOpenLock[4] = (Button)glassInclude[4] .findViewById(R.id.include_open_lock_button);
-        glassOpenLock[5] = (Button)glassInclude[5] .findViewById(R.id.include_open_lock_button);
-        glassOpenLock[6] = (Button)glassInclude[6] .findViewById(R.id.include_open_lock_button);
-        glassOpenLock[7] = (Button)glassInclude[7] .findViewById(R.id.include_open_lock_button);
-        glassOpenLock[8] = (Button)glassInclude[8] .findViewById(R.id.include_open_lock_button);
-        glassOpenLock[9] = (Button)glassInclude[9] .findViewById(R.id.include_open_lock_button);
-        glassOpenLock[10] = (Button)glassInclude[10].findViewById(R.id.include_open_lock_button);
-        glassOpenLock[11] = (Button)glassInclude[11].findViewById(R.id.include_open_lock_button);
-        glassOpenLock[12] = (Button)glassInclude[12].findViewById(R.id.include_open_lock_button);
-        glassOpenLock[13] = (Button)glassInclude[13].findViewById(R.id.include_open_lock_button);
-        glassOpenLock[14] = (Button)glassInclude[14].findViewById(R.id.include_open_lock_button);
+        glassOpenLock[0] = glassInclude[0] .findViewById(R.id.include_open_lock_button);
+        glassOpenLock[1] = glassInclude[1] .findViewById(R.id.include_open_lock_button);
+        glassOpenLock[2] = glassInclude[2] .findViewById(R.id.include_open_lock_button);
+        glassOpenLock[3] = glassInclude[3] .findViewById(R.id.include_open_lock_button);
+        glassOpenLock[4] = glassInclude[4] .findViewById(R.id.include_open_lock_button);
+        glassOpenLock[5] = glassInclude[5] .findViewById(R.id.include_open_lock_button);
+        glassOpenLock[6] = glassInclude[6] .findViewById(R.id.include_open_lock_button);
+        glassOpenLock[7] = glassInclude[7] .findViewById(R.id.include_open_lock_button);
+        glassOpenLock[8] = glassInclude[8] .findViewById(R.id.include_open_lock_button);
+        glassOpenLock[9] = glassInclude[9] .findViewById(R.id.include_open_lock_button);
+        glassOpenLock[10] = glassInclude[10].findViewById(R.id.include_open_lock_button);
+        glassOpenLock[11] = glassInclude[11].findViewById(R.id.include_open_lock_button);
+        glassOpenLock[12] = glassInclude[12].findViewById(R.id.include_open_lock_button);
+        glassOpenLock[13] = glassInclude[13].findViewById(R.id.include_open_lock_button);
+        glassOpenLock[14] = glassInclude[14].findViewById(R.id.include_open_lock_button);
 
-        glassTrunOn[0]  = (Button)glassInclude[0] .findViewById(R.id.include_trun_moto_button);
-        glassTrunOn[1]  = (Button)glassInclude[1] .findViewById(R.id.include_trun_moto_button);
-        glassTrunOn[2]  = (Button)glassInclude[2] .findViewById(R.id.include_trun_moto_button);
-        glassTrunOn[3]  = (Button)glassInclude[3] .findViewById(R.id.include_trun_moto_button);
-        glassTrunOn[4]  = (Button)glassInclude[4] .findViewById(R.id.include_trun_moto_button);
-        glassTrunOn[5]  = (Button)glassInclude[5] .findViewById(R.id.include_trun_moto_button);
-        glassTrunOn[6]  = (Button)glassInclude[6] .findViewById(R.id.include_trun_moto_button);
-        glassTrunOn[7]  = (Button)glassInclude[7] .findViewById(R.id.include_trun_moto_button);
-        glassTrunOn[8]  = (Button)glassInclude[8] .findViewById(R.id.include_trun_moto_button);
-        glassTrunOn[9]  = (Button)glassInclude[9] .findViewById(R.id.include_trun_moto_button);
-        glassTrunOn[10] = (Button)glassInclude[10].findViewById(R.id.include_trun_moto_button);
-        glassTrunOn[11] = (Button)glassInclude[11].findViewById(R.id.include_trun_moto_button);
-        glassTrunOn[12] = (Button)glassInclude[12].findViewById(R.id.include_trun_moto_button);
-        glassTrunOn[13] = (Button)glassInclude[13].findViewById(R.id.include_trun_moto_button);
-        glassTrunOn[14] = (Button)glassInclude[14].findViewById(R.id.include_trun_moto_button);
+        glassTrunOn[0]  = glassInclude[0] .findViewById(R.id.include_trun_moto_button);
+        glassTrunOn[1]  = glassInclude[1] .findViewById(R.id.include_trun_moto_button);
+        glassTrunOn[2]  = glassInclude[2] .findViewById(R.id.include_trun_moto_button);
+        glassTrunOn[3]  = glassInclude[3] .findViewById(R.id.include_trun_moto_button);
+        glassTrunOn[4]  = glassInclude[4] .findViewById(R.id.include_trun_moto_button);
+        glassTrunOn[5]  = glassInclude[5] .findViewById(R.id.include_trun_moto_button);
+        glassTrunOn[6]  = glassInclude[6] .findViewById(R.id.include_trun_moto_button);
+        glassTrunOn[7]  = glassInclude[7] .findViewById(R.id.include_trun_moto_button);
+        glassTrunOn[8]  = glassInclude[8] .findViewById(R.id.include_trun_moto_button);
+        glassTrunOn[9]  = glassInclude[9] .findViewById(R.id.include_trun_moto_button);
+        glassTrunOn[10] = glassInclude[10].findViewById(R.id.include_trun_moto_button);
+        glassTrunOn[11] = glassInclude[11].findViewById(R.id.include_trun_moto_button);
+        glassTrunOn[12] = glassInclude[12].findViewById(R.id.include_trun_moto_button);
+        glassTrunOn[13] = glassInclude[13].findViewById(R.id.include_trun_moto_button);
+        glassTrunOn[14] = glassInclude[14].findViewById(R.id.include_trun_moto_button);
 
-        glassTopCicle[0]  = (Button)glassInclude[0] .findViewById(R.id.include_top_circle);
-        glassTopCicle[1]  = (Button)glassInclude[1] .findViewById(R.id.include_top_circle);
-        glassTopCicle[2]  = (Button)glassInclude[2] .findViewById(R.id.include_top_circle);
-        glassTopCicle[3]  = (Button)glassInclude[3] .findViewById(R.id.include_top_circle);
-        glassTopCicle[4]  = (Button)glassInclude[4] .findViewById(R.id.include_top_circle);
-        glassTopCicle[5]  = (Button)glassInclude[5] .findViewById(R.id.include_top_circle);
-        glassTopCicle[6]  = (Button)glassInclude[6] .findViewById(R.id.include_top_circle);
-        glassTopCicle[7]  = (Button)glassInclude[7] .findViewById(R.id.include_top_circle);
-        glassTopCicle[8]  = (Button)glassInclude[8] .findViewById(R.id.include_top_circle);
-        glassTopCicle[9]  = (Button)glassInclude[9] .findViewById(R.id.include_top_circle);
-        glassTopCicle[10] = (Button)glassInclude[10].findViewById(R.id.include_top_circle);
-        glassTopCicle[11] = (Button)glassInclude[11].findViewById(R.id.include_top_circle);
-        glassTopCicle[12] = (Button)glassInclude[12].findViewById(R.id.include_top_circle);
-        glassTopCicle[13] = (Button)glassInclude[13].findViewById(R.id.include_top_circle);
-        glassTopCicle[14] = (Button)glassInclude[14].findViewById(R.id.include_top_circle);
+        glassTopCicle[0]  = glassInclude[0] .findViewById(R.id.include_top_circle);
+        glassTopCicle[1]  = glassInclude[1] .findViewById(R.id.include_top_circle);
+        glassTopCicle[2]  = glassInclude[2] .findViewById(R.id.include_top_circle);
+        glassTopCicle[3]  = glassInclude[3] .findViewById(R.id.include_top_circle);
+        glassTopCicle[4]  = glassInclude[4] .findViewById(R.id.include_top_circle);
+        glassTopCicle[5]  = glassInclude[5] .findViewById(R.id.include_top_circle);
+        glassTopCicle[6]  = glassInclude[6] .findViewById(R.id.include_top_circle);
+        glassTopCicle[7]  = glassInclude[7] .findViewById(R.id.include_top_circle);
+        glassTopCicle[8]  = glassInclude[8] .findViewById(R.id.include_top_circle);
+        glassTopCicle[9]  = glassInclude[9] .findViewById(R.id.include_top_circle);
+        glassTopCicle[10] = glassInclude[10].findViewById(R.id.include_top_circle);
+        glassTopCicle[11] = glassInclude[11].findViewById(R.id.include_top_circle);
+        glassTopCicle[12] = glassInclude[12].findViewById(R.id.include_top_circle);
+        glassTopCicle[13] = glassInclude[13].findViewById(R.id.include_top_circle);
+        glassTopCicle[14] = glassInclude[14].findViewById(R.id.include_top_circle);
 
-        glassBottomCicle[0]  = (Button)glassInclude[0] .findViewById(R.id.include_bottom_circle);
-        glassBottomCicle[1]  = (Button)glassInclude[1] .findViewById(R.id.include_bottom_circle);
-        glassBottomCicle[2]  = (Button)glassInclude[2] .findViewById(R.id.include_bottom_circle);
-        glassBottomCicle[3]  = (Button)glassInclude[3] .findViewById(R.id.include_bottom_circle);
-        glassBottomCicle[4]  = (Button)glassInclude[4] .findViewById(R.id.include_bottom_circle);
-        glassBottomCicle[5]  = (Button)glassInclude[5] .findViewById(R.id.include_bottom_circle);
-        glassBottomCicle[6]  = (Button)glassInclude[6] .findViewById(R.id.include_bottom_circle);
-        glassBottomCicle[7]  = (Button)glassInclude[7] .findViewById(R.id.include_bottom_circle);
-        glassBottomCicle[8]  = (Button)glassInclude[8] .findViewById(R.id.include_bottom_circle);
-        glassBottomCicle[9]  = (Button)glassInclude[9] .findViewById(R.id.include_bottom_circle);
-        glassBottomCicle[10] = (Button)glassInclude[10].findViewById(R.id.include_bottom_circle);
-        glassBottomCicle[11] = (Button)glassInclude[11].findViewById(R.id.include_bottom_circle);
-        glassBottomCicle[12] = (Button)glassInclude[12].findViewById(R.id.include_bottom_circle);
-        glassBottomCicle[13] = (Button)glassInclude[13].findViewById(R.id.include_bottom_circle);
-        glassBottomCicle[14] = (Button)glassInclude[14].findViewById(R.id.include_bottom_circle);
-        glass_return = (Button) findViewById(R.id.lock_16_return);
+        glassBottomCicle[0]  = glassInclude[0] .findViewById(R.id.include_bottom_circle);
+        glassBottomCicle[1]  = glassInclude[1] .findViewById(R.id.include_bottom_circle);
+        glassBottomCicle[2]  = glassInclude[2] .findViewById(R.id.include_bottom_circle);
+        glassBottomCicle[3]  = glassInclude[3] .findViewById(R.id.include_bottom_circle);
+        glassBottomCicle[4]  = glassInclude[4] .findViewById(R.id.include_bottom_circle);
+        glassBottomCicle[5]  = glassInclude[5] .findViewById(R.id.include_bottom_circle);
+        glassBottomCicle[6]  = glassInclude[6] .findViewById(R.id.include_bottom_circle);
+        glassBottomCicle[7]  = glassInclude[7] .findViewById(R.id.include_bottom_circle);
+        glassBottomCicle[8]  = glassInclude[8] .findViewById(R.id.include_bottom_circle);
+        glassBottomCicle[9]  = glassInclude[9] .findViewById(R.id.include_bottom_circle);
+        glassBottomCicle[10] = glassInclude[10].findViewById(R.id.include_bottom_circle);
+        glassBottomCicle[11] = glassInclude[11].findViewById(R.id.include_bottom_circle);
+        glassBottomCicle[12] = glassInclude[12].findViewById(R.id.include_bottom_circle);
+        glassBottomCicle[13] = glassInclude[13].findViewById(R.id.include_bottom_circle);
+        glassBottomCicle[14] = glassInclude[14].findViewById(R.id.include_bottom_circle);
+        glass_return = findViewById(R.id.lock_16_return);
 
 
-        process_bar[0] = (ProgressBar) findViewById(R.id.lock16_process_bar_01);
-        process_bar[1] = (ProgressBar) findViewById(R.id.lock16_process_bar_02);
-        process_bar[2] = (ProgressBar) findViewById(R.id.lock16_process_bar_03);
-        process_bar[3] = (ProgressBar) findViewById(R.id.lock16_process_bar_04);
-        process_bar[4] = (ProgressBar) findViewById(R.id.lock16_process_bar_05);
-        process_bar[5] = (ProgressBar) findViewById(R.id.lock16_process_bar_06);
-        process_bar[6] = (ProgressBar) findViewById(R.id.lock16_process_bar_07);
-        process_bar[7] = (ProgressBar) findViewById(R.id.lock16_process_bar_08);
-        process_bar[8] = (ProgressBar) findViewById(R.id.lock16_process_bar_09);
-        process_bar[9] = (ProgressBar) findViewById(R.id.lock16_process_bar_10);
-        process_bar[10] = (ProgressBar) findViewById(R.id.lock16_process_bar_11);
-        process_bar[11] = (ProgressBar) findViewById(R.id.lock16_process_bar_12);
-        process_bar[12] = (ProgressBar) findViewById(R.id.lock16_process_bar_13);
-        process_bar[13] = (ProgressBar) findViewById(R.id.lock16_process_bar_14);
-        process_bar[14] = (ProgressBar) findViewById(R.id.lock16_process_bar_15);
+        process_bar[0] = findViewById(R.id.lock16_process_bar_01);
+        process_bar[1] = findViewById(R.id.lock16_process_bar_02);
+        process_bar[2] = findViewById(R.id.lock16_process_bar_03);
+        process_bar[3] = findViewById(R.id.lock16_process_bar_04);
+        process_bar[4] = findViewById(R.id.lock16_process_bar_05);
+        process_bar[5] = findViewById(R.id.lock16_process_bar_06);
+        process_bar[6] = findViewById(R.id.lock16_process_bar_07);
+        process_bar[7] = findViewById(R.id.lock16_process_bar_08);
+        process_bar[8] = findViewById(R.id.lock16_process_bar_09);
+        process_bar[9] = findViewById(R.id.lock16_process_bar_10);
+        process_bar[10] = findViewById(R.id.lock16_process_bar_11);
+        process_bar[11] = findViewById(R.id.lock16_process_bar_12);
+        process_bar[12] = findViewById(R.id.lock16_process_bar_13);
+        process_bar[13] = findViewById(R.id.lock16_process_bar_14);
+        process_bar[14] = findViewById(R.id.lock16_process_bar_15);
 
                 // 3.设置按钮点击事件
         glass_return.setOnClickListener(onClickListener);
@@ -810,7 +809,7 @@ public class Lock_16_Activity extends AppCompatActivity {
                 glassBottomCicle[keyNum].setVisibility(View.INVISIBLE);
                 
                 temp_bytes[0] = (byte) 0x06;       //0x06 开锁命令
-                temp_bytes[1] = (byte) keyNum; //地址 参数0  地址，LED模式，增加删除指纹ID,
+                temp_bytes[1] = keyNum; //地址 参数0  地址，LED模式，增加删除指纹ID,
                 temp_bytes[4] = (byte) pressState[keyNum];//锁开关
                 byte[] send = makeStringtoFramePackage(temp_bytes);
                 /*串口发送字节*/

@@ -2,8 +2,6 @@ package com.example.administrator.sanfengnu;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 public class TryingWearActivityTest {
 
     @Test

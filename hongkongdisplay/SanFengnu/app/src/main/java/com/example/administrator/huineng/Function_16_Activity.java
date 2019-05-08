@@ -1,27 +1,17 @@
-package com.example.administrator.sanfengnu;
+package com.example.administrator.huineng;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.Toast;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Timer;
-import java.util.TimerTask;
+import com.example.administrator.huineng.R;
 
 public class Function_16_Activity extends AppCompatActivity {
 
@@ -95,38 +85,38 @@ public class Function_16_Activity extends AppCompatActivity {
     }
     private void initViews() {
         //这是获得include中的控件
-        glass_01_include = (View)findViewById(R.id.function16_glass_01);
-        glass_02_include = (View)findViewById(R.id.function16_glass_02);
-        glass_03_include = (View)findViewById(R.id.function16_glass_03);
-        glass_04_include = (View)findViewById(R.id.function16_glass_04);
-        glass_05_include = (View)findViewById(R.id.function16_glass_05);
-        glass_06_include = (View)findViewById(R.id.function16_glass_06);
-        glass_07_include = (View)findViewById(R.id.function16_glass_07);
-        glass_08_include = (View)findViewById(R.id.function16_glass_08);
-        glass_09_include = (View)findViewById(R.id.function16_glass_09);
-        glass_10_include = (View)findViewById(R.id.function16_glass_10);
-        glass_11_include = (View)findViewById(R.id.function16_glass_11);
-        glass_12_include = (View)findViewById(R.id.function16_glass_12);
-        glass_13_include = (View)findViewById(R.id.function16_glass_13);
-        glass_14_include = (View)findViewById(R.id.function16_glass_14);
-        glass_15_include = (View)findViewById(R.id.function16_glass_15);
+        glass_01_include = findViewById(R.id.function16_glass_01);
+        glass_02_include = findViewById(R.id.function16_glass_02);
+        glass_03_include = findViewById(R.id.function16_glass_03);
+        glass_04_include = findViewById(R.id.function16_glass_04);
+        glass_05_include = findViewById(R.id.function16_glass_05);
+        glass_06_include = findViewById(R.id.function16_glass_06);
+        glass_07_include = findViewById(R.id.function16_glass_07);
+        glass_08_include = findViewById(R.id.function16_glass_08);
+        glass_09_include = findViewById(R.id.function16_glass_09);
+        glass_10_include = findViewById(R.id.function16_glass_10);
+        glass_11_include = findViewById(R.id.function16_glass_11);
+        glass_12_include = findViewById(R.id.function16_glass_12);
+        glass_13_include = findViewById(R.id.function16_glass_13);
+        glass_14_include = findViewById(R.id.function16_glass_14);
+        glass_15_include = findViewById(R.id.function16_glass_15);
         //获取include中的子控件
-        glass_01_include_cicle = (Button)glass_01_include.findViewById(R.id.include_cicle);
-        glass_02_include_cicle = (Button)glass_02_include.findViewById(R.id.include_cicle);
-        glass_03_include_cicle = (Button)glass_03_include.findViewById(R.id.include_cicle);
-        glass_04_include_cicle = (Button)glass_04_include.findViewById(R.id.include_cicle);
-        glass_05_include_cicle = (Button)glass_05_include.findViewById(R.id.include_cicle);
-        glass_06_include_cicle = (Button)glass_06_include.findViewById(R.id.include_cicle);
-        glass_07_include_cicle = (Button)glass_07_include.findViewById(R.id.include_cicle);
-        glass_08_include_cicle = (Button)glass_08_include.findViewById(R.id.include_cicle);
-        glass_09_include_cicle = (Button)glass_09_include.findViewById(R.id.include_cicle);
-        glass_10_include_cicle = (Button)glass_10_include.findViewById(R.id.include_cicle);
-        glass_11_include_cicle = (Button)glass_11_include.findViewById(R.id.include_cicle);
-        glass_12_include_cicle = (Button)glass_12_include.findViewById(R.id.include_cicle);
-        glass_13_include_cicle = (Button)glass_13_include.findViewById(R.id.include_cicle);
-        glass_14_include_cicle = (Button)glass_14_include.findViewById(R.id.include_cicle);
-        glass_15_include_cicle = (Button)glass_15_include.findViewById(R.id.include_cicle);
-        glass_return = (Button) findViewById(R.id.function_return);
+        glass_01_include_cicle = glass_01_include.findViewById(R.id.include_cicle);
+        glass_02_include_cicle = glass_02_include.findViewById(R.id.include_cicle);
+        glass_03_include_cicle = glass_03_include.findViewById(R.id.include_cicle);
+        glass_04_include_cicle = glass_04_include.findViewById(R.id.include_cicle);
+        glass_05_include_cicle = glass_05_include.findViewById(R.id.include_cicle);
+        glass_06_include_cicle = glass_06_include.findViewById(R.id.include_cicle);
+        glass_07_include_cicle = glass_07_include.findViewById(R.id.include_cicle);
+        glass_08_include_cicle = glass_08_include.findViewById(R.id.include_cicle);
+        glass_09_include_cicle = glass_09_include.findViewById(R.id.include_cicle);
+        glass_10_include_cicle = glass_10_include.findViewById(R.id.include_cicle);
+        glass_11_include_cicle = glass_11_include.findViewById(R.id.include_cicle);
+        glass_12_include_cicle = glass_12_include.findViewById(R.id.include_cicle);
+        glass_13_include_cicle = glass_13_include.findViewById(R.id.include_cicle);
+        glass_14_include_cicle = glass_14_include.findViewById(R.id.include_cicle);
+        glass_15_include_cicle = glass_15_include.findViewById(R.id.include_cicle);
+        glass_return = findViewById(R.id.function_return);
 
         glass_01_include_cicle.setOnClickListener(onClickListener);
         glass_02_include_cicle.setOnClickListener(onClickListener);

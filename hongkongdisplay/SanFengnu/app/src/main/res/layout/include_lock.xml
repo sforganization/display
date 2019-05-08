@@ -39,7 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/top_circle"
-        android:textColor="#FF0B03"
+        android:textColor="#9C9C9C"
         android:textSize="32sp"
         android:clickable="false"
         app:layout_constraintStart_toStartOf="@+id/include_trun_moto_button"

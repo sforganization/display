@@ -1,9 +1,7 @@
-package com.example.administrator.sanfengnu;
+package com.example.administrator.huineng;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
@@ -17,16 +15,14 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.administrator.huineng.R;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,13 +31,37 @@ import java.io.RandomAccessFile;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class PasswdActivity extends AppCompatActivity {
+public class FingerActivity extends AppCompatActivity {
 
-    protected  int glass_num = 0;
-    protected  int inputCnt = 0;   //输入记数
-    protected  String inputNum = new String();   //输入值
-    protected  String inputtmp = new String();   //输入值
-    protected  boolean inputCheck = true;   //输入是否有效值
+    protected final byte  FINGER_STATE_ADD =  1;
+    protected final byte  FINGER_STATE_DEL =  2;
+    protected final byte  FINGER_STATE_DEF =  (byte)0xff;
+
+    protected final byte  ACK_SUCCESS       =  0;
+    protected final byte  ACK_FAILED        =  1;
+    protected final byte  ACK_AGAIN         =  2;
+
+    protected final byte  MSG_SUCCESS       =  7;
+    protected final byte  MSG_FAILED        =  8;
+    protected final byte  MSG_AGAIN         =  9;
+    protected final byte  MSG_INVISIABLE   =  10;  //隐藏TEXTVIEW
+
+    String filePath = "/mnt/sdcard/SanFeng/data/";
+    String fileName = "userInfo";   //保存用户信息，哪个指纹已经录入系统
+
+    protected  int userID = 0;   //用户ID
+    protected  int userIDSave = 0;   //保存前面一次选择的用户ID
+    protected  volatile  int fingerState = 0;   //当前状态，是增加用户还是删除用户
+
+    protected  String stringSave = new String();  //保存在文件中的字符串
+    char userInfo[] = new char[6];
+
+    protected  Button fingerReturn = null;
+    protected  Button changPasswdReturn = null;
+    protected  Button fingerDelUser = null;
+    protected  Button fingerAddUser = null;
+    protected  Button fingerID[]  = new Button[6];
+    protected  TextView fingerTextView = null;
 
     protected void hideBottomKey() {
         if (Build.VERSION.SDK_INT > 11 && Build.VERSION.SDK_INT < 19) {
@@ -109,13 +129,13 @@ public class PasswdActivity extends AppCompatActivity {
         //装填信息
         //时间数据包之前的信息
         terimalPackage[0] = (byte)0xAA;			   //包头
-        terimalPackage[1] = (byte)data[0];         //cmd 命令
-        terimalPackage[2] = (byte)data[1];         //参数0  地址，LED模式，增加删除指纹ID,
-        terimalPackage[3] = (byte)data[2];         //
-        terimalPackage[4] = (byte)data[3];         //
-        terimalPackage[5] = (byte)data[4];         //数据  （锁开关 + 方向 + 时间）
-        terimalPackage[6] = (byte)data[5];         //
-        terimalPackage[7] = (byte)data[6];         //
+        terimalPackage[1] = data[0];         //cmd 命令
+        terimalPackage[2] = data[1];         //参数0  地址，LED模式，增加删除指纹ID,
+        terimalPackage[3] = data[2];         //
+        terimalPackage[4] = data[3];         //
+        terimalPackage[5] = data[4];         //数据  （锁开关 + 方向 + 时间）
+        terimalPackage[6] = data[5];         //
+        terimalPackage[7] = data[6];         //
 
         //计算校验和
         //转化为无符号进行校验
@@ -128,8 +148,10 @@ public class PasswdActivity extends AppCompatActivity {
         return terimalPackage;
     }
 
-    private void sendFingerENPack() {  //发送包
-        byte[] temp_bytes = new byte[]{0x09, 0x11, 0x00, 0x00, 0x00, 0x00, 0x00};  // 09 使能指纹接收命令，0x11保留参数
+    private void sendAddUserPack() {  //发送包
+        byte[] temp_bytes = new byte[]{0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};  // 0x04 增加指纹命令
+        temp_bytes[1] = (byte)userID; //需要增加的USER   id
+
         byte[] send = makeStringtoFramePackage(temp_bytes);
         /*串口发送字节*/
         try {
@@ -140,8 +162,10 @@ public class PasswdActivity extends AppCompatActivity {
         }
     }
 
-    private void sendFingerDisablePack() {  //发送包
-        byte[] temp_bytes = new byte[]{0x0A, 0x11, 0x00, 0x00, 0x00, 0x00, 0x00};  // 0A 不使能指纹接收命令，0x11保留参数
+    private void sendDelUserPack() {  //发送包
+        byte[] temp_bytes = new byte[]{0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};  // 0x04 删除指纹命令
+        temp_bytes[1] = (byte)userID; //需要增加的USER   id
+
         byte[] send = makeStringtoFramePackage(temp_bytes);
         /*串口发送字节*/
         try {
@@ -151,7 +175,6 @@ public class PasswdActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
     private void sendReadyPack() {  //发送就绪包
         byte[] temp_bytes = new byte[]{0x03, 0x11, 0x00, 0x00, 0x00, 0x00, 0x00};  // 03 reday 命令，0x11保留参数
         byte[] send = makeStringtoFramePackage(temp_bytes);
@@ -198,7 +221,7 @@ public class PasswdActivity extends AppCompatActivity {
         checkSum = 0;
         for(i = 0 ; i < 53; i++) //和校验
         {
-            checkSum += (byte)recvArry[index + i];
+            checkSum += recvArry[index + i];
         }
 
         if(checkSum != (byte)0x55 - 1)
@@ -222,9 +245,6 @@ public class PasswdActivity extends AppCompatActivity {
     protected int checkRecPack() {   //串口接收数据
 
         int tmp_cnt = 0;
-
-        init_serial();          //初始化串口
-        sendFingerENPack();        /*串口发送使能指纹识别*/
         try {
             while(exit != true) {
                 sizeRec = 0;
@@ -232,7 +252,6 @@ public class PasswdActivity extends AppCompatActivity {
                     cnt = -1;
                     if(ttyS0InputStream != null)
                         cnt = ttyS0InputStream.read(recvData);
-                    Log.d("fff", "passwd 串口接收数据...");
                     if (cnt != -1) {
                         System.arraycopy(recvData, 0, recvArry, sizeRec, cnt);
                         sizeRec += cnt;
@@ -245,27 +264,34 @@ public class PasswdActivity extends AppCompatActivity {
                 if (jungleRecPack() == 0) //检查参数合法性
                 {
                     break;
-                } else  //出错重新发
-                {
-                    TimerTask task = new TimerTask() {
-                        @Override
-                        public void run() {
-                            /**
-                             *要执行的操作
-                             */
-                            sendFingerENPack();        /*串口重新发送就绪包*/
-                            this.cancel();
-                        }
-                    };
-                    Timer timer = new Timer();
-                    timer.schedule(task, 200);//300ms后执行TimeTask的run方法
                 }
             }
         } catch (IOException e) {
+            i = 5;
             e.printStackTrace();
         }
 
-        return 0;
+        if(tmp_cnt < 5) {
+            return 0;
+        }
+        else {
+            Looper.prepare();   //只能在主线程中使用toast 所以要加这两句
+            Toast toast= Toast.makeText(FingerActivity.this,"CONNETCT FAILED!",Toast.LENGTH_SHORT);
+            toast.show();
+            Looper.loop();
+            return -1;
+        }
+    }
+    private void sendFingerDisablePack() {  //发送包
+        byte[] temp_bytes = new byte[]{0x0A, 0x11, 0x00, 0x00, 0x00, 0x00, 0x00};  // 0A 不使能指纹接收命令，0x11保留参数
+        byte[] send = makeStringtoFramePackage(temp_bytes);
+        /*串口发送字节*/
+        try {
+            ttyS0OutputStream.write(send);
+            //ttyS1InputStream.read(send);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -273,7 +299,9 @@ public class PasswdActivity extends AppCompatActivity {
         super.onDestroy();
 
         exit = true;
+
         sendFingerDisablePack();
+
         if (myThread != null) {
             Log.d("aaa", "onDestroy 发送线程停止interrupt。。。。。。");
             myThread.interrupt();
@@ -307,145 +335,177 @@ public class PasswdActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {      //判断标志位
-                case 5:
-                    /**
-                     获取数据，更新UI
-                     */
-                    //密码正确，写入
-                    Intent intent = new Intent();
-                    Bundle myBudle=new Bundle();
-                    myBudle.putInt("glass_num", glass_num);
-                    intent.putExtras(myBudle);
+                case MSG_SUCCESS:
+                    //成功
+                    if(fingerState == FINGER_STATE_ADD)
+                    {
+                        //更新UI
+                        userInfo[userID - 1] = '1';
+                        fingerID[userID - 1].setBackgroundResource(R.drawable.tick_select);
+                        //写入文件
 
-                    // 移除所有消息
-                    handler.removeCallbacksAndMessages(null);
-                    // 或者移除单条消息
-                    handler.removeMessages(msg.what);
+                        Log.e("fff", "添加成功，写入文件。。。。。。");
+                        String str = new String(userInfo);
+                        writeTxtToFile(str, filePath, fileName);
+                        //提示成功
+                        fingerTextView.setText("添加用户成功！");
+                        fingerTextView.setVisibility(View.VISIBLE);
+                        fingerState = FINGER_STATE_DEF;  //清空状态
 
-                    Toast toast= Toast.makeText(PasswdActivity.this,"2333 try wearing!",Toast.LENGTH_SHORT);
-                    toast.show();
+                    }else if(fingerState == FINGER_STATE_DEL)
+                    {
+                        userInfo[userID - 1] = '0';
+                        fingerID[userID - 1].setBackgroundResource(R.drawable.pick_select);
+                        //写入文件
 
-                    intent.setClass(PasswdActivity.this, TryingWearActivity.class);
-                    startActivity(intent);
-                    finish();
+                        String str = new String(userInfo);
+                        writeTxtToFile(str, filePath, fileName);
+                        Log.e("fff", "删除成功，写入文件。。。。。。");
+                        //提示成功
+                        fingerTextView.setText("删除用户成功！");
+                        fingerTextView.setVisibility(View.VISIBLE);
+                        fingerState = FINGER_STATE_DEF;  //清空状态
+                    }
                     break;
-                case 6: //未识别到的指纹
-                    /**
-                     获取数据，更新UI
-                     */
-                    input_6.setVisibility(input_6.VISIBLE);
-                    input_5.setVisibility(input_5.VISIBLE);
-                    input_4.setVisibility(input_4.VISIBLE);
-                    input_3.setVisibility(input_3.VISIBLE);
-                    input_2.setVisibility(input_2.VISIBLE);
-                    input_1.setVisibility(input_1.VISIBLE);
+                case MSG_FAILED: //失败
+                    if(fingerState == FINGER_STATE_ADD)
+                    {
+                        //更新UI
+                        //提示成功
+                        fingerTextView.setText("添加用户失败！");
+                        fingerTextView.setVisibility(View.VISIBLE);
+                        fingerState = FINGER_STATE_DEF;  //清空状态
 
-                    error_info.setText("未识别的指纹!");
-                    error_info.setVisibility(error_info.VISIBLE);
+                    }else if(fingerState == FINGER_STATE_DEL)
+                    {
+                        fingerTextView.setText("删除用户失败！");
+                        fingerTextView.setVisibility(View.VISIBLE);
+                        fingerState = FINGER_STATE_DEF;  //清空状态
+                    }
+                    break;
+
+                case MSG_AGAIN: //再试一次
+                    if(fingerState == FINGER_STATE_ADD) {
+                        fingerTextView.setText("请松手再按一次！");
+                        fingerTextView.setVisibility(View.VISIBLE);
+                    }
+                    break;
+                case MSG_INVISIABLE: //隐藏TextView
+                    fingerTextView.setVisibility(View.INVISIBLE);
                     break;
                 default:
                     break;
             }
-            if(inputNum.length() > 0) {
-                inputNum = "";
-                inputCnt = 0;
-            }
         }
     };
 
-    PasswdActivity.WorkThread myThread = new PasswdActivity.WorkThread();  //串口接收指纹数据
-
-
+    FingerActivity.WorkThread myThread = new FingerActivity.WorkThread();  //串口接收指纹数据
+    volatile  int invisable_cnt = 0;
     public class WorkThread extends Thread {
 
         @Override
         public void run() {
             super.run();
+
             /**
              耗时操作
              */
+
             while(!isInterrupted()) {
                 if(checkRecPack() == 0) {
-                    //从全局池中返回一个message实例，避免多次创建message（如new Message）
                     Message msg = Message.obtain();
-//            msg.obj = glassData;
-//            msg.what=1;   //标志消息的标志
-
-
-                    if (ackCheck == 0) //判断应答是否正确
+                    if (ackCheck == ACK_SUCCESS) //判断应答是否正确
                     {
-                        handler.sendEmptyMessageDelayed(5, 1);  //发送消息
-                    } else if (ackCheck == 1) //判断应答错误
+                        handler.sendEmptyMessageDelayed(MSG_SUCCESS, 1);  //发送消息  成功信号
+                    } else if (ackCheck == ACK_FAILED) //判断应答错误
                     {
-                        handler.sendEmptyMessageDelayed(6, 1);  //发送指纹识别错误消息
+                        handler.sendEmptyMessageDelayed(MSG_FAILED, 1);  //发送指纹识别错误消息
+                    }else if (ackCheck == ACK_AGAIN) //再次ACK_AGAIN,       //再次输入
+                    {
+                        handler.sendEmptyMessageDelayed(MSG_AGAIN, 1);  //
                     } else {  //异常
 
                     }
+                        TimerTask task = new TimerTask() {
+                            @Override
+                            public void run() {
+                                /**
+                                 *要执行的操作
+                                 */
+                                if(invisable_cnt > 0) {
+
+                                    Log.e("fff", "x 大于0次 。。。。。。");
+                                    Toast toast= Toast.makeText(FingerActivity.this,"大于0次！!",Toast.LENGTH_SHORT);
+                                    toast.show();
+                                    invisable_cnt--;
+                                }else if(invisable_cnt == 0) {  //两个隐藏任务会重叠，显示与不显示时间出错，。如果当前有任务还在等待隐藏这个textview，不操作，取最后一次的操作隐藏
+                                    handler.sendEmptyMessageDelayed(MSG_INVISIABLE, 1);  //发送消息  成功信号
+                                }
+                                this.cancel();
+                            }
+                        };
+                        Timer timer = new Timer();
+                        timer.schedule(task, 4000);//300ms后执行TimeTask的run方法
                 }
             }
         }
     }
 
-
-    TextView input_1 = null;
-    TextView input_2 = null;
-    TextView input_3 = null;
-    TextView input_4 = null;
-    TextView input_5 = null;
-    TextView input_6 = null;
-    TextView error_info  = null;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        int i = 0;
         hideBottomKey();
-        setContentView(R.layout.activity_passwd);
+        setContentView(R.layout.activity_finger);
 
-        Bundle bundle = this.getIntent().getExtras();
-        glass_num = bundle.getInt("glass_num");
 
-        String filePath = "/mnt/sdcard/SanFeng/data/";
-        String fileName = "loginfo";
         makeFilePath(filePath, fileName);
+        if(readFile(filePath, fileName) != 0)
+        {
+            //用户文件损坏，删除再重新写入
 
-        //writeTxtToFile("666666", filePath, fileName);
-        readFile(filePath, fileName);
+            int result = new ShellCommandExecutor()
+                    .addCommand("mount -o remount,rw /system")
+                    .addCommand("rm /mnt/sdcard/SanFeng/data/userInfo")
+                    .execute();
 
-        Button input_00_Button = (Button) findViewById(R.id.passwd_digit_00);
-        Button input_01_Button = (Button) findViewById(R.id.passwd_digit_01);
-        Button input_02_Button = (Button) findViewById(R.id.passwd_digit_02);
-        Button input_03_Button = (Button) findViewById(R.id.passwd_digit_03);
-        Button input_04_Button = (Button) findViewById(R.id.passwd_digit_04);
-        Button input_05_Button = (Button) findViewById(R.id.passwd_digit_05);
-        Button input_06_Button = (Button) findViewById(R.id.passwd_digit_06);
-        Button input_07_Button = (Button) findViewById(R.id.passwd_digit_07);
-        Button input_08_Button = (Button) findViewById(R.id.passwd_digit_08);
-        Button input_09_Button = (Button) findViewById(R.id.passwd_digit_09);
-        Button passwd_del_button = (Button) findViewById(R.id.passwd_del_button);
-        Button passwd_return_button = (Button) findViewById(R.id.passwd_ruturn);
+            makeFilePath(filePath, fileName);
+            String str = new String(userInfo);
+            writeTxtToFile(str, filePath, fileName);
+        }
 
+
+        changPasswdReturn  =  findViewById(R.id.finger_chang_passwd);
+        fingerReturn        =  findViewById(R.id.finger_return);
+        fingerDelUser       =  findViewById(R.id.finger_del_user);
+        fingerAddUser       =  findViewById(R.id.finger_add_user);
+        fingerID[0] 		=  findViewById(R.id.finger_user_1);
+        fingerID[1] 		=  findViewById(R.id.finger_user_2);
+        fingerID[2] 		=  findViewById(R.id.finger_user_3);
+        fingerID[3] 		=  findViewById(R.id.finger_user_4);
+        fingerID[4] 		=  findViewById(R.id.finger_user_5);
+        fingerID[5] 		=  findViewById(R.id.finger_user_6);
+        fingerTextView  	=  findViewById(R.id.finger_note_txt);
         // 3.设置按钮点击事件
-        input_00_Button.setOnClickListener(onClickListener);
-        input_01_Button.setOnClickListener(onClickListener);
-        input_02_Button.setOnClickListener(onClickListener);
-        input_03_Button.setOnClickListener(onClickListener);
-        input_04_Button.setOnClickListener(onClickListener);
-        input_05_Button.setOnClickListener(onClickListener);
-        input_06_Button.setOnClickListener(onClickListener);
-        input_07_Button.setOnClickListener(onClickListener);
-        input_08_Button.setOnClickListener(onClickListener);
-        input_09_Button.setOnClickListener(onClickListener);
-        passwd_del_button.setOnClickListener(onClickListener);
-        passwd_return_button.setOnClickListener(onClickListener);
+        for(i = 0; i < 6; i++) {
+            fingerID[i].setOnClickListener(onClickListener);
+        }
 
-        input_1 = (TextView)findViewById(R.id.passwd_input_1);
-        input_2 = (TextView)findViewById(R.id.passwd_input_2);
-        input_3 = (TextView)findViewById(R.id.passwd_input_3);
-        input_4 = (TextView)findViewById(R.id.passwd_input_4);
-        input_5 = (TextView)findViewById(R.id.passwd_input_5);
-        input_6 = (TextView)findViewById(R.id.passwd_input_6);
-        error_info  = (TextView)findViewById(R.id.passwd_error);
+        fingerReturn.setOnClickListener(onClickListener);
+        fingerDelUser.setOnClickListener(onClickListener);
+        fingerAddUser.setOnClickListener(onClickListener);
+        changPasswdReturn.setOnClickListener(onClickListener);
 
+        for(i = 0; i < 6; i++) {
+            if (userInfo[i] == '1') {
+                fingerID[i].setBackgroundResource(R.drawable.tick_shade);
+            } else {
+                fingerID[i].setBackgroundResource(R.drawable.pick_shade);
+            }
+        }
+
+        init_serial();          //初始化串口
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
@@ -457,125 +517,111 @@ public class PasswdActivity extends AppCompatActivity {
             }
         };
         Timer timer = new Timer();
-        timer.schedule(task, 200);//300ms后执行TimeTask的run方法
+        timer.schedule(task, 200);//300ms后执行TimeTask的run方法  task现在只负责接收
+
     }
 
     // 2.得到 OnClickListener 对象
     View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            inputCheck = true; //默认有效
             switch (v.getId()) {
-                case R.id.passwd_digit_00:
-                    if(inputCnt < 6)
-                        inputNum += "0";
+                case R.id.finger_user_1:
+                    userID = 1;
                     break;
-                case R.id.passwd_digit_01:
-                    if(inputCnt < 6)
-                        inputNum += "1";
+                case R.id.finger_user_2:
+                    userID = 2;
                     break;
-                case R.id.passwd_digit_02:
-                    if(inputCnt < 6)
-                        inputNum += "2";
+                case R.id.finger_user_3:
+                    userID = 3;
                     break;
-                case R.id.passwd_digit_03:
-                    if(inputCnt < 6)
-                        inputNum += "3";
+                case R.id.finger_user_4:
+                    userID = 4;
                     break;
-                case R.id.passwd_digit_04:
-                    if(inputCnt < 6)
-                        inputNum += "4";
+                case R.id.finger_user_5:
+                    userID = 5;
                     break;
-                case R.id.passwd_digit_05:
-                    if(inputCnt < 6)
-                        inputNum += "5";
+                case R.id.finger_user_6:
+                    userID = 6;
                     break;
-                case R.id.passwd_digit_06:
-                    if(inputCnt < 6)
-                        inputNum += "6";
-                    break;
-                case R.id.passwd_digit_07:
-                    if(inputCnt < 6)
-                        inputNum += "7";
-                    break;
-                case R.id.passwd_digit_08:
-                    if(inputCnt < 6)
-                        inputNum += "8";
-                    break;
-                case R.id.passwd_digit_09:
-                    if(inputCnt < 6)
-                        inputNum += "9";
-                    break;
-                case R.id.passwd_del_button:
-                    inputCheck = false; //无效输入
-                    if(inputNum.length() > 0) {
-                        inputNum = inputNum.substring(0, inputNum.length() - 1);
-                        inputCnt--;
+                case R.id.finger_add_user:
+                    if(userID == 0)//没有选择用户
+                    {
+                        fingerTextView.setText("请先选择需要增加的用户！");
+                        fingerTextView.setVisibility(View.VISIBLE);
+
+                        TimerTask task = new TimerTask() {
+                            @Override
+                            public void run() {
+                                Message msg = Message.obtain();
+                                handler.sendEmptyMessageDelayed(MSG_INVISIABLE, 1);  //发送消息  成功信号
+                                this.cancel();
+                            }
+                        };
+                        Timer timer = new Timer();
+                        timer.schedule(task, 1400);//更新UI  不可见
+                    }else{
+                        fingerTextView.setText("请将手指按下！");
+                        fingerTextView.setVisibility(View.VISIBLE);
+                        fingerState = 1;     //1 状态是增加用户
+                        sendAddUserPack();        /*串口发送*/
                     }
                     break;
-                case R.id.passwd_ruturn:
-                    inputCheck = false; //无效输入
-                    //清理
-                    inputCnt = 0;
-                    finish();
+                case R.id.finger_del_user:
+                    if(userID == 0)//没有选择用户
+                    {
+                        fingerTextView.setText("请先选择需要删除的用户！");
+                        fingerTextView.setVisibility(View.VISIBLE);
+                        TimerTask task = new TimerTask() {
+                            @Override
+                            public void run() {
+                                Message msg = Message.obtain();
+                                handler.sendEmptyMessageDelayed(MSG_INVISIABLE, 1);  //发送消息  成功信号
+                                this.cancel();
+                            }
+                        };
+                        Timer timer = new Timer();
+                        timer.schedule(task, 1400);//更新UI  不可见
+                    }else
+                    {
+                        fingerState = 2;     //1 状态是删除用户
+                        sendDelUserPack();        /*串口*/
+                    }
                     break;
-                default:
-                    inputCheck = false; //无效输入
-                    break;
-            }
 
-            if((inputCheck == true) && (inputCnt < 6))
-            {
-                inputCnt++;
-            }
-
-            //输入框显示*号
-            input_1.setVisibility(input_1.INVISIBLE);
-            input_2.setVisibility(input_2.INVISIBLE);
-            input_3.setVisibility(input_3.INVISIBLE);
-            input_4.setVisibility(input_4.INVISIBLE);
-            input_5.setVisibility(input_5.INVISIBLE);
-            input_6.setVisibility(input_6.INVISIBLE);
-            switch(inputCnt){
-                case 6:
-                    input_6.setVisibility(input_6.VISIBLE);
-                case 5:
-                    input_5.setVisibility(input_5.VISIBLE);
-                case 4:
-                    input_4.setVisibility(input_4.VISIBLE);
-                case 3:
-                    input_3.setVisibility(input_3.VISIBLE);
-                case 2:
-                    input_2.setVisibility(input_2.VISIBLE);
-                case 1:
-                    input_1.setVisibility(input_1.VISIBLE);
-                    break;
-                default:
-                    break;
-            }
-
-            if(inputCnt == 6){
-                if (!inputNum.equals(g_passwd)) {
-                    error_info.setVisibility(error_info.VISIBLE);
-                }
-                else{ //密码正确
+                case R.id.finger_chang_passwd:
                     Intent intent = new Intent();
-                    Bundle myBudle=new Bundle();
-                    myBudle.putInt("glass_num", glass_num);
-                    intent.putExtras(myBudle);
-
-                    intent.setClass(PasswdActivity.this, TryingWearActivity.class);
-                    PasswdActivity.this.startActivity(intent);
+                    intent.setClass(FingerActivity.this, ChangPasswdActivity.class);
+                    FingerActivity.this.startActivity(intent);
+                    break;
+                case R.id.finger_return:
+                    //清理
                     finish();
-                }
-            }
-            else{
-                error_info.setVisibility(error_info.INVISIBLE);
+                    break;
+                default:
+                    break;
             }
 
+            if(userIDSave != userID){
+                fingerTextView.setVisibility(View.INVISIBLE);
+                if(userIDSave  != 0){ //第一次进来
+                    if (userInfo[userIDSave - 1] == '1') {
+                        fingerID[userIDSave - 1].setBackgroundResource(R.drawable.tick_shade);
+                    } else {
+                        fingerID[userIDSave - 1].setBackgroundResource(R.drawable.pick_shade);
+                    }
+                }
+
+                if (userInfo[userID - 1] == '1') {
+                    fingerID[userID - 1].setBackgroundResource(R.drawable.tick_select);
+                } else {
+                    fingerID[userID - 1].setBackgroundResource(R.drawable.pick_select);
+                }
+
+                userIDSave = userID;
+            }
         }
     };
-
     // 将字符串写入到文本文件中
     public void writeTxtToFile(String strcontent, String filePath, String fileName) {
 
@@ -586,16 +632,16 @@ public class PasswdActivity extends AppCompatActivity {
         String strFilePath = filePath+fileName;
         StringBuilder strBuilder = new StringBuilder(strcontent);
         len = strcontent.length();
-        charArry = strcontent.toCharArray();
+//        charArry = strcontent.toCharArray();
 
         //简单加密,先小写后大写，放到ASCII后面看不到的数据就可以
-        for(i = 0; i < 6; i++) {
-            charArry[i] = (char)((int)charArry[i] - (int)'!');
-            //charArry[i] = (char)((int)charArry[i] + (int)'!');
-        }
+//        for(i = 0; i < 6; i++) {
+//            charArry[i] = (char)((int)charArry[i] - (int)'!');
+//            //charArry[i] = (char)((int)charArry[i] + (int)'!');
+//        }
         //strcontent = Arrays.toString(charArry);
 
-        strcontent = String.valueOf(charArry);
+//        strcontent = String.valueOf(charArry);
 
         // 每次写入时，都换行写
         String strContent = strcontent + "\r\n";
@@ -612,14 +658,14 @@ public class PasswdActivity extends AppCompatActivity {
             raf.write(strContent.getBytes());
             raf.close();
         } catch (Exception e) {
-            Log.d("TestFile", "Error on write File:" + e);
+            Log.e("TestFile", "Error on write File:" + e);
         }
     }
 
     /**
      * 读入TXT文件
      */
-    public void readFile(String filePath, String fileName) {
+    public int readFile(String filePath, String fileName) {
         int i, len;
         char charArry[] = new char[6];
 
@@ -637,27 +683,29 @@ public class PasswdActivity extends AppCompatActivity {
                 // 一次读入一行数据
                 //System.out.println(line);
                 //解密
-                len = line.length();
+                len = line.length();   //指纹信息，0 未录入 1 已经录入
                 if(len != 6)
                 {
-                    Toast toast= Toast.makeText(PasswdActivity.this,"密码文件损坏！!",Toast.LENGTH_SHORT);
+                    userInfo = "000000".toCharArray();
+                    Toast toast= Toast.makeText(FingerActivity.this,"用户指纹文件损坏！!",Toast.LENGTH_SHORT);
                     toast.show();
-                    break;
+                    return -1;
                 }
-                charArry = line.toCharArray();
 
-                //简单加密,先小写后大写，放到ASCII后面看不到的数据就可以
-                for(i = 0; i < 6; i++) {
-                    charArry[i] = (char)((int)charArry[i] + (int)'!');
-                    //charArry[i] = (char)((int)charArry[i] + (int)'!');
-                }
-                g_passwd = String.valueOf(charArry);
+                userInfo = line.toCharArray();
+//
+//                //简单加密,先小写后大写，放到ASCII后面看不到的数据就可以
+//                for(i = 0; i < 6; i++) {
+//                    charArry[i] = (char)((int)charArry[i] + (int)'!');
+//                    //charArry[i] = (char)((int)charArry[i] + (int)'!');
+//                }
+//                g_passwd = String.valueOf(charArry);
 
-//                g_passwd = line;
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return 0;
     }
 
     // 生成文件
@@ -720,7 +768,7 @@ public class PasswdActivity extends AppCompatActivity {
             return execute(mCommands.toString());
         }
 
-        public PasswdActivity.ShellCommandExecutor addCommand(String cmd) {
+        public FingerActivity.ShellCommandExecutor addCommand(String cmd) {
             if (TextUtils.isEmpty(cmd)) {
                 throw new IllegalArgumentException("command can not be null.");
             }

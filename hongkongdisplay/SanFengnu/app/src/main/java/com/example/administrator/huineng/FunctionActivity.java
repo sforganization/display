@@ -1,7 +1,9 @@
-package com.example.administrator.sanfengnu;
+package com.example.administrator.huineng;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.example.administrator.huineng.R;
 
 public class FunctionActivity extends AppCompatActivity {
 

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".TryingWearActivity">
+    tools:context="com.example.administrator.huineng.TryingWearActivity">
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/frameLayout7"

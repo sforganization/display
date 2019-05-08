@@ -4,6 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.administrator.huineng.FunctionActivity">
+    tools:context="com.example.administrator.huineng.Advertisment">
 
+    <VideoView
+        android:id="@+id/videoView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:focusable="false"
+        android:focusableInTouchMode="false"/>
 </android.support.constraint.ConstraintLayout>

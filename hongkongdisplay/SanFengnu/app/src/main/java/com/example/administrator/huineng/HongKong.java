@@ -1,4 +1,4 @@
-package com.example.administrator.sanfengnu;
+package com.example.administrator.huineng;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -16,6 +16,8 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import com.example.administrator.huineng.R;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +44,10 @@ public class HongKong extends AppCompatActivity {
     Button hongKong1_run = null;
     Button hongKong2_up = null;
     Button hongKong2_down = null;
+    Button hongKong2_lock = null;
 
+    protected  int dir_mode[] = new int[3];
+    protected  int tpd_mode[] = new int[3];
 
     protected  int hongKong1_run_state;
     protected  int hongKong2_run_state;
@@ -119,13 +124,13 @@ public class HongKong extends AppCompatActivity {
         //装填信息
         //时间数据包之前的信息
         terimalPackage[0] = (byte)0xAA;			   //包头
-        terimalPackage[1] = (byte)data[0];         //cmd 命令
-        terimalPackage[2] = (byte)data[1];         //参数0  地址，LED模式，增加删除指纹ID,
-        terimalPackage[3] = (byte)data[2];         //
-        terimalPackage[4] = (byte)data[3];         //
-        terimalPackage[5] = (byte)data[4];         //数据  （锁开关 + 方向 + 时间）
-        terimalPackage[6] = (byte)data[5];         //
-        terimalPackage[7] = (byte)data[6];         //
+        terimalPackage[1] = data[0];         //cmd 命令
+        terimalPackage[2] = data[1];         //参数0  地址，LED模式，增加删除指纹ID,
+        terimalPackage[3] = data[2];         //
+        terimalPackage[4] = data[3];         //
+        terimalPackage[5] = data[4];         //数据  （锁开关 + 方向 + 时间）
+        terimalPackage[6] = data[5];         //
+        terimalPackage[7] = data[6];         //
 
         //计算校验和
         //转化为无符号进行校验
@@ -217,7 +222,7 @@ public class HongKong extends AppCompatActivity {
         checkSum = 0;
         for(i = 0 ; i < 53; i++) //和校验
         {
-            checkSum += (byte)recvArry[index + i];
+            checkSum += recvArry[index + i];
         }
 
         if(checkSum != (byte)0x55 - 1)
@@ -241,14 +246,14 @@ public class HongKong extends AppCompatActivity {
         return 0;
     }
 
-    volatile  private boolean exit = false;
+    volatile  private boolean g_exit = false;
 
     protected int checkRecPack() {   //串口接收数据
 
         int tmp_cnt = 0;
 
         try {
-            while(exit != true) {
+            while(g_exit != true) {
                 sizeRec = 0;
                 do {
                     cnt = -1;
@@ -258,9 +263,9 @@ public class HongKong extends AppCompatActivity {
                         System.arraycopy(recvData, 0, recvArry, sizeRec, cnt);
                         sizeRec += cnt;
                     }
-                } while ((sizeRec < 53) && (exit == false));  //少于一个包数据  //或者已经退出
+                } while ((sizeRec < 53) && (g_exit == false));  //少于一个包数据  //或者已经退出
 
-                if (exit == true)
+                if (g_exit == true)
                     return -1;
 
                 if (jungleRecPack() == 0) //检查参数合法性
@@ -277,25 +282,51 @@ public class HongKong extends AppCompatActivity {
     }
 
 
-    WorkThread myThread = new WorkThread();  //串口接收数据
 
-    public class WorkThread extends Thread {
-        @Override
+    MyThread myThread = new MyThread();  //串口接收数据
+
+    public class MyThread extends Thread {
+        private boolean suspend = false;
+
+        private String control = ""; // 只是需要一个对象而已，这个对象没有实际意义
+
+        public void setSuspend(boolean suspend) {
+            if (!suspend) {
+                synchronized (control) {
+                    control.notifyAll();
+                }
+            }
+            this.suspend = suspend;
+        }
+
+        public boolean isSuspend() {
+            return this.suspend;
+        }
+
         public void run() {
-            super.run();
-            /**
-             耗时操作
-             */
-            while(!isInterrupted()) {
-                if(checkRecPack() == 0) {
-                    //由timer发送消息
-                    //要判断是哪个锁到了零点
-                    if(lock_timer[zero_num] > 0)
-                        lock_timer[zero_num] = 2;  //2ms后发送
-                    // if(trun_timer > 0) trun_timer = 2;
+            while (true) {
+                synchronized (control) {
+                    if (suspend) {
+                        try {
+                            control.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                while(!isInterrupted() && (suspend == false)) {
+                    if(checkRecPack() == 0) {
+                        //由timer发送消息
+                        //要判断是哪个锁到了零点
+                        if(lock_timer[zero_num] > 0)
+                            lock_timer[zero_num] = 2;  //2ms后发送
+                        // if(trun_timer > 0) trun_timer = 2;
+                    }
                 }
             }
         }
+
     }
 
     @Override
@@ -303,9 +334,10 @@ public class HongKong extends AppCompatActivity {
         super.onDestroy();
         int i;
 
-        exit =  true;
+        g_exit =  true;
         if (myThread != null) {
-            Log.d("aaa", "lock_16_  发送线程停止interrupt。。。。。。");
+            Log.d("aaa", "honkong 1  发送线程停止interrupt。。。。。。");
+            myThread.setSuspend(true);
             myThread.interrupt();
         }
 
@@ -341,12 +373,22 @@ public class HongKong extends AppCompatActivity {
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler(){
 
-        byte msgNum = 0;
+        int msgNum = 0;
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            msgNum = (byte)msg.what;
+            msgNum = msg.what;
 
-            if((msgNum & (byte)(0x80)) != 0) {
+            if(msgNum == 0x1100){
+                //g_exit = true;   //只暂停， 停止线程会出现 问题
+
+                stopTimer();
+                handler.removeCallbacksAndMessages(null);
+                Intent intent = new Intent();
+                intent.setClass(HongKong.this, Advertisment.class);
+                startActivityForResult(intent, 1);
+            }
+
+            else if((msgNum & (byte)(0x80)) != 0) {
                 msgNum &= (byte)(0x7F);
                 glassTrunOn[msgNum].setEnabled(true);
                 glassOpenLock[msgNum].setVisibility(View.INVISIBLE);
@@ -385,6 +427,127 @@ public class HongKong extends AppCompatActivity {
         }
     }
 
+    volatile int movieTimes = 0;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == 1){
+            movieTimes = 0;
+            myThread.setSuspend(false);
+            isReady = true;
+            startTimer();
+        }
+    }
+
+
+    Timer timer = null;
+    TimerTask tick_task= null;
+    TimerTask serial_task= null;
+    volatile boolean isReady = true;
+
+    private void startTimer(){
+        if (timer == null) {
+            timer = new Timer();
+        }
+
+        if (serial_task == null) {
+            serial_task = new TimerTask() {
+                @Override
+                public void run() {
+                    /**
+                     *要执行的操作
+                     */
+
+                    myThread.start();        /*延时一段时间再开启线程*/
+                }
+            };
+        }
+        else {
+            myThread.setSuspend(false);
+        }
+
+        if (tick_task == null) {
+            tick_task = new TimerTask() {
+                @Override
+                public void run() {
+
+                            if(isReady == false)
+                                return;
+
+                            /**
+                             *要执行的操作
+                             */
+                            movieTimes++;
+                            if(movieTimes >= OPEN_LOCK_TIME + 300)//屏幕没有操作跳到广告页面
+                            {
+                                movieTimes = 0;
+                                isReady = false;
+                                Message msg = Message.obtain();
+                                handler.sendEmptyMessageDelayed((0x1100), 1);  //发送消息
+                            }
+
+                            for(i = 0; i < 3; i++){
+                                if(lock_timer[i] > 0){
+                                    lock_timer[i]--;
+                                    if(lock_timer[i] == 0)
+                                    {
+                                        Message msg = Message.obtain();
+                                        handler.sendEmptyMessageDelayed((i | 0x80), 1);  //单片机收到零点，发送消息停止process
+                                    }
+                                }
+
+                                if(trun_timer[i] > 0){
+                                    trun_timer[i]--;
+                                    if(trun_timer[i] == 0)
+                                    {
+                                        Message msg = Message.obtain();
+                                        handler.sendEmptyMessageDelayed((i | 0x40), 1);  //发送消息
+                                    }
+                                }
+                            }
+                }
+            };
+        }
+
+        if(timer != null)
+        {
+            if(tick_task != null ) {
+                timer.schedule(tick_task, 10, 1);//1ms后执行Tick   1ms 的tick
+            }
+
+        }
+    }
+
+    private void stopTimer(){
+
+        isReady = false;
+        if (serial_task != null) {
+            myThread.setSuspend(true);
+          /*  myThread.exit = true;
+            try {
+                myThread.sleep(200);
+                myThread.interrupt();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            serial_task.cancel();
+            serial_task = null;*/
+        }
+
+        if (tick_task != null) {
+            tick_task.cancel();
+            tick_task = null;
+        }
+
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+        System.gc();
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -395,8 +558,17 @@ public class HongKong extends AppCompatActivity {
         Bundle myBudle = this.getIntent().getExtras();
         glassData = myBudle.getByteArray("glassData");
 
-        hongKong1_run_state = glassData[3];
-        hongKong2_run_state = glassData[6];
+        for(i = 0; i < 3; i++){
+            dir_mode[i] = glassData[3 + 3 * i];
+            tpd_mode[i] = glassData[3 + 3 * i + 1];
+        }
+
+        if(dir_mode[0] == 0x02) //正反转
+            hongKong1_run_state = 0;
+        else
+            hongKong1_run_state = 1; //0x06 停止
+
+        hongKong2_run_state = glassData[6];   //0 正转，上升  1 反转 下降
 
         setContentView(R.layout.activity_hong_kong);
 
@@ -407,104 +579,58 @@ public class HongKong extends AppCompatActivity {
 
         initViews();
         init_serial();          //初始化串口
-
+        startTimer();
         changeViewShade();
-        Timer timer = new Timer();
-        timer.schedule(tick_task, 1, 1);//1ms后执行Tick   1ms 的tick
-        timer.schedule(serial_task, 50);//300ms后执行TimeTask的run方法
+        if(serial_task != null ) {
+            timer.schedule(serial_task, 50);//300ms后执行TimeTask的run方法
+        }
     }
 
-    TimerTask serial_task = new TimerTask() {
-        @Override
-        public void run() {
-
-            /**
-             *要执行的操作
-             */
-            myThread.start();        /*延时一段时间再开启线程*/
-        }
-    };
-
-    TimerTask tick_task = new TimerTask() {
-        int i;
-
-        @Override
-        public void run() {
-            /**
-             *要执行的操作
-             */
-            for(i = 0; i < 3; i++){
-                if(lock_timer[i] > 0){
-                    lock_timer[i]--;
-                    if(lock_timer[i] == 0)
-                    {
-                        Message msg = Message.obtain();
-                        handler.sendEmptyMessageDelayed((i | 0x80), 1);  //发送消息
-                    }
-                }
-
-                if(trun_timer[i] > 0){
-                    trun_timer[i]--;
-                    if(trun_timer[i] == 0)
-                    {
-                        Message msg = Message.obtain();
-                        handler.sendEmptyMessageDelayed((i | 0x40), 1);  //发送消息
-                    }
-                }
-            }
-        }
-    };
     private void initViews() {
         //这是获得include中的控件
-        glassInclude[0] = (View)findViewById(R.id.hongkong1_lock);
-        glassInclude[1] = (View)findViewById(R.id.hongkong2_lock);
-        glassInclude[2] = (View)findViewById(R.id.hongkong3_lock);
-        hongKong3_include = (View)findViewById(R.id.Hongkong3_mode);
-
-
+        glassInclude[0] = findViewById(R.id.hongkong1_lock);
+        glassInclude[2] = findViewById(R.id.hongkong3_lock);
+        hongKong3_include = findViewById(R.id.Hongkong3_mode);
 
         //获取include中的子控件
 
-        hongKong3_includeCicle = (Button)hongKong3_include.findViewById(R.id.include_cicle);
-        glassOpenLock[0] = (Button)glassInclude[0] .findViewById(R.id.include_open_lock_button);
-        glassOpenLock[1] = (Button)glassInclude[1] .findViewById(R.id.include_open_lock_button);
-        glassOpenLock[2] = (Button)glassInclude[2] .findViewById(R.id.include_open_lock_button);
+        hongKong3_includeCicle = hongKong3_include.findViewById(R.id.include_cicle);
+        glassOpenLock[0] = glassInclude[0] .findViewById(R.id.include_open_lock_button);
+        glassOpenLock[2] = glassInclude[2] .findViewById(R.id.include_open_lock_button);
 
-        glassTrunOn[0]  = (Button)glassInclude[0] .findViewById(R.id.include_trun_moto_button);
-        glassTrunOn[1]  = (Button)glassInclude[1] .findViewById(R.id.include_trun_moto_button);
-        glassTrunOn[2]  = (Button)glassInclude[2] .findViewById(R.id.include_trun_moto_button);
+        glassTrunOn[0]  = glassInclude[0] .findViewById(R.id.include_trun_moto_button);
+        glassTrunOn[2]  = glassInclude[2] .findViewById(R.id.include_trun_moto_button);
 
-        glassTopCicle[0]  = (Button)glassInclude[0] .findViewById(R.id.include_top_circle);
-        glassTopCicle[1]  = (Button)glassInclude[1] .findViewById(R.id.include_top_circle);
-        glassTopCicle[2]  = (Button)glassInclude[2] .findViewById(R.id.include_top_circle);
+        glassTopCicle[0]  = glassInclude[0] .findViewById(R.id.include_top_circle);
+        glassTopCicle[2]  = glassInclude[2] .findViewById(R.id.include_top_circle);
 
-        glassBottomCicle[0]  = (Button)glassInclude[0] .findViewById(R.id.include_bottom_circle);
-        glassBottomCicle[1]  = (Button)glassInclude[1] .findViewById(R.id.include_bottom_circle);
-        glassBottomCicle[2]  = (Button)glassInclude[2] .findViewById(R.id.include_bottom_circle);
+        glassBottomCicle[0]  = glassInclude[0] .findViewById(R.id.include_bottom_circle);
+        glassBottomCicle[2]  = glassInclude[2] .findViewById(R.id.include_bottom_circle);
 
-        process_bar[0] = (ProgressBar) findViewById(R.id.hongkong1_process);
-        process_bar[1] = (ProgressBar) findViewById(R.id.hongkong2_process);
-        process_bar[2] = (ProgressBar) findViewById(R.id.hongkong3_process);
+        process_bar[0] = findViewById(R.id.hongkong1_process);
+        process_bar[2] = findViewById(R.id.hongkong3_process);
 
-        hongKong1_run = (Button)findViewById(R.id.Hongkong1_trun);
-        hongKong2_up = (Button)findViewById(R.id.Hongkong2_up);
-        hongKong2_down = (Button)findViewById(R.id.Hongkong2_down);
+        hongKong1_run = findViewById(R.id.Hongkong1_trun);
+        hongKong2_up = findViewById(R.id.Hongkong2_up);
+        hongKong2_down = findViewById(R.id.Hongkong2_down);
+        hongKong2_lock = findViewById(R.id.Hongkong2_lock);
 
         // 3.设置按钮点击事件
         glassOpenLock[0] .setOnClickListener(onClickListener);
-        glassOpenLock[1] .setOnClickListener(onClickListener);
         glassOpenLock[2] .setOnClickListener(onClickListener);
 
         glassTrunOn[0] .setOnClickListener(onClickListener);
-        glassTrunOn[1] .setOnClickListener(onClickListener);
         glassTrunOn[2] .setOnClickListener(onClickListener);
         hongKong3_includeCicle.setOnClickListener(onClickListener);
         hongKong1_run.setOnClickListener(onClickListener);
         hongKong2_up.setOnClickListener(onClickListener);
         hongKong2_down.setOnClickListener(onClickListener);
+        hongKong2_lock.setOnClickListener(onClickListener);
     }
 
 
+    final int TRUN_TIME = 1000;
+    final int OPEN_LOCK_TIME = 6000;
     // 2.得到 OnClickListener 对象
     View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
@@ -512,17 +638,23 @@ public class HongKong extends AppCompatActivity {
             byte[] temp_bytes = new byte[]{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};  // 0x02 更新状状态命令
             boolean inputCheck = true; //默认有效
             boolean inputCheck2 = true; //默认有效
+            boolean openlock = false;
             byte keyNum = 0; //按键号
 
-            final int TRUN_TIME = 1000;
-            final int OPEN_LOCK_TIME = 6000;
 
+            movieTimes = 0;  //清空这个视频时间，有按下重新开始计时
             //if (v.getId() == R.id.lock_16_return) {    //把返回键
             switch (v.getId()) {
                 case R.id.Hongkong1_trun:
                     keyNum = 0;
                     hongKong1_run_state ^= 1;
-                    temp_bytes[5] = (byte) hongKong1_run_state;  //方向
+                    if(hongKong1_run_state == 0) //正常，正反转
+                        temp_bytes[5] = (byte) 0x02;  //方向 MOTO_FR_FWD_REV 0x02
+                    else //停止
+                        temp_bytes[5] = (byte) 0x03;  //方向 MOTO_FR_STOP 0x03
+
+                    //temp_bytes[6] = (byte)tpd_mode[0]; //时间 mode MOTO_TIME_HALF 0x06
+                    temp_bytes[6] = (byte)0x06; //时间 mode MOTO_TIME_HALF 0x06
                     break;
 
                 case R.id.Hongkong2_up:
@@ -535,6 +667,7 @@ public class HongKong extends AppCompatActivity {
 
                     hongKong2_run_state = 0;
                     temp_bytes[5] = (byte) hongKong2_run_state;  //方向
+                    temp_bytes[6] = (byte)tpd_mode[1]; //时间
                     hongKong2_up.setEnabled(false); //禁止按下
                     hongKong2_down.setEnabled(true); //可以按下
                     break;
@@ -549,9 +682,21 @@ public class HongKong extends AppCompatActivity {
 
                     hongKong2_run_state = 1;
                     temp_bytes[5] = (byte) hongKong2_run_state;  //方向
+                    temp_bytes[6] = (byte)tpd_mode[1]; //时间
                     hongKong2_up.setEnabled(true); //可以按下
                     hongKong2_down.setEnabled(false); //禁止按下
                     break;
+                case R.id.Hongkong2_lock:
+                    keyNum = 1;
+                    if(hongKong2_run_state != 0){
+                        Toast toast= Toast.makeText(HongKong.this,"请先升起。。。",Toast.LENGTH_SHORT);
+                        toast.show();
+                        return;
+                    }
+
+                    openlock = true;
+                    break;
+
                 default:
                     inputCheck2 = false;
                     break;
@@ -559,11 +704,17 @@ public class HongKong extends AppCompatActivity {
 
             if(inputCheck2) {
                 changeViewShade();
-                temp_bytes[0] = (byte) 0x02;       //0x02 更新状状态命令
-                temp_bytes[1] = (byte) keyNum; //地址 参数0  地址，LED模式，增加删除指纹ID,
+                if(openlock == true) {
+                    temp_bytes[0] = (byte) 0x06;       //0x06 开锁命令
+                    temp_bytes[4] = (byte) 0;//锁开关
+                }else{
+                    temp_bytes[0] = (byte) 0x02;       //0x02 更新状状态命令
+                }
+
+                temp_bytes[1] = keyNum; //地址 参数0  地址，LED模式，增加删除指纹ID,
 
                 //temp_bytes[5] = (byte)dir_mode;  //方向
-                temp_bytes[6] = (byte) 0;  //时间
+                //temp_bytes[6] = (byte) 0;  //时间
 
                 byte[] send = makeStringtoFramePackage(temp_bytes);
                 /*串口发送字节*/
@@ -585,28 +736,6 @@ public class HongKong extends AppCompatActivity {
                     if (v.getId() == R.id.include_open_lock_button) {
                         if (pressState[keyNum] == 1) {
                             pressState[keyNum] = 0;//1表示开锁已经按下    parent.include_open_lock_button.setEnabled(false); //禁止按下
-                            lock_timer[keyNum] = OPEN_LOCK_TIME;
-                        }
-                    } else {
-                        if (pressState[keyNum] == 0) {
-                            pressState[keyNum] = 1;  //1表示转动已经按下
-                            trun_timer[keyNum] = TRUN_TIME;
-                        }
-                    }
-                    break;
-
-                case R.id.hongkong2_lock:
-                    keyNum = 1;
-                    if (v.getId() == R.id.include_open_lock_button) {
-                        if (pressState[keyNum] == 1) {
-
-                            if(hongKong2_run_state != 0){
-                                Toast toast= Toast.makeText(HongKong.this,"请先升起。。。!",Toast.LENGTH_SHORT);
-                                toast.show();
-                                return;
-                            }
-
-                            pressState[keyNum] = 0;//1表示开锁已经按下                        parent.include_open_lock_button.setEnabled(false); //禁止按下
                             lock_timer[keyNum] = OPEN_LOCK_TIME;
                         }
                     } else {
@@ -657,7 +786,7 @@ public class HongKong extends AppCompatActivity {
                 glassBottomCicle[keyNum].setVisibility(View.INVISIBLE);
 
                 temp_bytes[0] = (byte) 0x06;       //0x06 开锁命令
-                temp_bytes[1] = (byte) keyNum; //地址 参数0  地址，LED模式，增加删除指纹ID,
+                temp_bytes[1] = keyNum; //地址 参数0  地址，LED模式，增加删除指纹ID,
                 temp_bytes[4] = (byte) pressState[keyNum];//锁开关
                 byte[] send = makeStringtoFramePackage(temp_bytes);
                 /*串口发送字节*/

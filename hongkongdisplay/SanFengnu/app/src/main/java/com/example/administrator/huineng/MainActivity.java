@@ -1,11 +1,10 @@
-package com.example.administrator.sanfengnu;
+package com.example.administrator.huineng;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,6 +16,8 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.administrator.huineng.R;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -124,13 +125,13 @@ public class MainActivity extends AppCompatActivity {
         //装填信息
         //时间数据包之前的信息
         terimalPackage[0] = (byte)0xAA;			   //包头
-        terimalPackage[1] = (byte)data[0];         //cmd 命令
-        terimalPackage[2] = (byte)data[1];         //参数0  地址，LED模式，增加删除指纹ID,
-        terimalPackage[3] = (byte)data[2];         //
-        terimalPackage[4] = (byte)data[3];         //
-        terimalPackage[5] = (byte)data[4];         //数据  （锁开关 + 方向 + 时间）
-        terimalPackage[6] = (byte)data[5];         //
-        terimalPackage[7] = (byte)data[6];         //
+        terimalPackage[1] = data[0];         //cmd 命令
+        terimalPackage[2] = data[1];         //参数0  地址，LED模式，增加删除指纹ID,
+        terimalPackage[3] = data[2];         //
+        terimalPackage[4] = data[3];         //
+        terimalPackage[5] = data[4];         //数据  （锁开关 + 方向 + 时间）
+        terimalPackage[6] = data[5];         //
+        terimalPackage[7] = data[6];         //
 
         //计算校验和
         //转化为无符号进行校验
@@ -191,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
         checkSum = 0;
         for(i = 0 ; i < 53; i++) //和校验
         {
-            checkSum += (byte)recvArry[index + i];
+            checkSum += recvArry[index + i];
         }
 
         if(checkSum != (byte)0x55 - 1)
@@ -225,8 +226,8 @@ public class MainActivity extends AppCompatActivity {
         //数据正确，写入文件
         String filePath = "/mnt/sdcard/SanFeng/data/";
         String fileName = "stateInfo";   //保存用户信息，哪个指纹已经录入系统
-        glassDataWrite = (byte[])glassData.clone();
-        glassDataWrite[0] = (byte) ((byte)glassDataWrite[0] ^ (byte) 0x80);  //去除最高位
+        glassDataWrite = glassData.clone();
+        glassDataWrite[0] = (byte) (glassDataWrite[0] ^ (byte) 0x80);  //去除最高位
         String str = new String(glassDataWrite);
         writeTxtToFile(str, filePath, fileName);
 //            readFile(filePath, fileName);
@@ -378,16 +379,16 @@ public class MainActivity extends AppCompatActivity {
 
                     if((glassData[1] & 0x7F) == 16)   //6个手表
                     {
-                        Toast toast= Toast.makeText(MainActivity.this,"6个!",Toast.LENGTH_SHORT);
+                        Toast toast= Toast.makeText(MainActivity.this,"3个!",Toast.LENGTH_SHORT);
                         toast.show();
-                        Log.d("fff", "main 由事件进入 不到16个手表。。。。。。");  //
+                        Log.d("fff", "main 由事件进入");  //
                         intent.setClass(MainActivity.this, HongKong.class);
                         MainActivity.this.startActivity(intent);
                         finish();
                     }
                     else
                     {
-                        Toast toast= Toast.makeText(MainActivity.this,"16个!",Toast.LENGTH_SHORT);
+                        Toast toast= Toast.makeText(MainActivity.this,"接收到数据!",Toast.LENGTH_SHORT);
                         toast.show();
                         Log.d("fff", "main 由事件进入。。。。。。");  //
                         intent.setClass(MainActivity.this, HongKong.class);
@@ -439,8 +440,8 @@ public class MainActivity extends AppCompatActivity {
         //串口检测正确就写入文件中
 
 
-        enter_button = (Button) findViewById(R.id.enter_button);
-        text_view    = (TextView)findViewById(R.id.main_textview);
+        enter_button = findViewById(R.id.enter_button);
+        text_view    = findViewById(R.id.main_textview);
 
         enter_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
@@ -477,7 +478,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        bar = (ProgressBar) findViewById(R.id.progressSelf);
+        bar = findViewById(R.id.progressSelf);
         int i = 0;
 
 
@@ -604,7 +605,7 @@ public class MainActivity extends AppCompatActivity {
                 // 一次读入一行数据
                 //System.out.println(line);
                 len = line.length();   //指纹信息，0 未录入 1 已经录入
-                str = line.toString();
+                str = line;
                 tem = str.getBytes();
                //由于char是16位宽与string一致，所以如果用byte是1开头的会多占一个字节长度
                 charArry = line.toCharArray();

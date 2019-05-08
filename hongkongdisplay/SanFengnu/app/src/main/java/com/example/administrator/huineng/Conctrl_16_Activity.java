@@ -1,15 +1,10 @@
-package com.example.administrator.sanfengnu;
+package com.example.administrator.huineng;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.PixelFormat;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.Build;
@@ -21,16 +16,11 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
+
+import com.example.administrator.huineng.R;
 
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -86,22 +76,22 @@ public class Conctrl_16_Activity extends AppCompatActivity {
 
     private void initViews() {
         // 1.找到按钮控件
-        setButton = (Button) findViewById(R.id.set);
-        glass_01_Button = (Button) findViewById(R.id.glass_01);
-        glass_02_Button = (Button) findViewById(R.id.glass_02);
-        glass_03_Button = (Button) findViewById(R.id.glass_03);
-        glass_04_Button = (Button) findViewById(R.id.glass_04);
-        glass_05_Button = (Button) findViewById(R.id.glass_05);
-        glass_06_Button = (Button) findViewById(R.id.glass_06);
-        glass_07_Button = (Button) findViewById(R.id.glass_07);
-        glass_08_Button = (Button) findViewById(R.id.glass_08);
-        glass_09_Button = (Button) findViewById(R.id.glass_09);
-        glass_10_Button = (Button) findViewById(R.id.glass_10);
-        glass_11_Button = (Button) findViewById(R.id.glass_11);
-        glass_12_Button = (Button) findViewById(R.id.glass_12);
-        glass_13_Button = (Button) findViewById(R.id.glass_13);
-        glass_14_Button = (Button) findViewById(R.id.glass_14);
-        glass_15_Button = (Button) findViewById(R.id.glass_15);
+        setButton = findViewById(R.id.set);
+        glass_01_Button = findViewById(R.id.glass_01);
+        glass_02_Button = findViewById(R.id.glass_02);
+        glass_03_Button = findViewById(R.id.glass_03);
+        glass_04_Button = findViewById(R.id.glass_04);
+        glass_05_Button = findViewById(R.id.glass_05);
+        glass_06_Button = findViewById(R.id.glass_06);
+        glass_07_Button = findViewById(R.id.glass_07);
+        glass_08_Button = findViewById(R.id.glass_08);
+        glass_09_Button = findViewById(R.id.glass_09);
+        glass_10_Button = findViewById(R.id.glass_10);
+        glass_11_Button = findViewById(R.id.glass_11);
+        glass_12_Button = findViewById(R.id.glass_12);
+        glass_13_Button = findViewById(R.id.glass_13);
+        glass_14_Button = findViewById(R.id.glass_14);
+        glass_15_Button = findViewById(R.id.glass_15);
 
         // 3.设置按钮点击事件
         setButton.setOnClickListener(onClickListener);
@@ -171,7 +161,7 @@ public class Conctrl_16_Activity extends AppCompatActivity {
             }
 
             if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) { //插入
-                UsbDevice device = (UsbDevice)intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
                 if (device != null) {
                     // call your method that cleans up and closes communication with the device
                     Timer timer = new Timer();

@@ -1,4 +1,4 @@
-package com.example.administrator.sanfengnu;
+package com.example.administrator.huineng;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -16,6 +16,8 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.administrator.huineng.R;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -113,13 +115,13 @@ public class ManagerActivity extends AppCompatActivity {
         //装填信息
         //时间数据包之前的信息
         terimalPackage[0] = (byte)0xAA;			   //包头
-        terimalPackage[1] = (byte)data[0];         //cmd 命令
-        terimalPackage[2] = (byte)data[1];         //参数0  地址，LED模式，增加删除指纹ID,
-        terimalPackage[3] = (byte)data[2];         //
-        terimalPackage[4] = (byte)data[3];         //
-        terimalPackage[5] = (byte)data[4];         //数据  （锁开关 + 方向 + 时间）
-        terimalPackage[6] = (byte)data[5];         //
-        terimalPackage[7] = (byte)data[6];         //
+        terimalPackage[1] = data[0];         //cmd 命令
+        terimalPackage[2] = data[1];         //参数0  地址，LED模式，增加删除指纹ID,
+        terimalPackage[3] = data[2];         //
+        terimalPackage[4] = data[3];         //
+        terimalPackage[5] = data[4];         //数据  （锁开关 + 方向 + 时间）
+        terimalPackage[6] = data[5];         //
+        terimalPackage[7] = data[6];         //
 
         //计算校验和
         //转化为无符号进行校验
@@ -192,9 +194,9 @@ public class ManagerActivity extends AppCompatActivity {
         checkSum = 0;
         for(i = 0 ; i < 52; i++) //和校验
         {
-            checkSum += (byte)recvArry[index + i];
+            checkSum += recvArry[index + i];
         }
-        checkSum += (byte)recvArry[index + i];
+        checkSum += recvArry[index + i];
         if(checkSum != (byte)0x55 - 1)
             return -1; //
 
@@ -379,12 +381,12 @@ public class ManagerActivity extends AppCompatActivity {
                      */
                     //密码正确，写入，且更新到输入框
 
-                    input_6.setVisibility(input_6.VISIBLE);
-                    input_5.setVisibility(input_5.VISIBLE);
-                    input_4.setVisibility(input_4.VISIBLE);
-                    input_3.setVisibility(input_3.VISIBLE);
-                    input_2.setVisibility(input_2.VISIBLE);
-                    input_1.setVisibility(input_1.VISIBLE);
+                    input_6.setVisibility(View.VISIBLE);
+                    input_5.setVisibility(View.VISIBLE);
+                    input_4.setVisibility(View.VISIBLE);
+                    input_3.setVisibility(View.VISIBLE);
+                    input_2.setVisibility(View.VISIBLE);
+                    input_1.setVisibility(View.VISIBLE);
 
                     manage_finger.setClickable(true);
                     manage_open_lock.setClickable(true);
@@ -399,19 +401,19 @@ public class ManagerActivity extends AppCompatActivity {
                     manage_function_txt.setVisibility(View.VISIBLE);
 
                     error_info.setText("密码正确!");
-                    error_info.setVisibility(error_info.VISIBLE);
+                    error_info.setVisibility(View.VISIBLE);
                     passwdState = true;
                     break;
                 case 4:
                     /**
                      获取数据，更新UI
                      */
-                    input_6.setVisibility(input_6.VISIBLE);
-                    input_5.setVisibility(input_5.VISIBLE);
-                    input_4.setVisibility(input_4.VISIBLE);
-                    input_3.setVisibility(input_3.VISIBLE);
-                    input_2.setVisibility(input_2.VISIBLE);
-                    input_1.setVisibility(input_1.VISIBLE);
+                    input_6.setVisibility(View.VISIBLE);
+                    input_5.setVisibility(View.VISIBLE);
+                    input_4.setVisibility(View.VISIBLE);
+                    input_3.setVisibility(View.VISIBLE);
+                    input_2.setVisibility(View.VISIBLE);
+                    input_1.setVisibility(View.VISIBLE);
 
                     manage_finger.setClickable(false);
                     manage_open_lock.setClickable(false);
@@ -426,7 +428,7 @@ public class ManagerActivity extends AppCompatActivity {
                     manage_function_txt.setVisibility(View.INVISIBLE);
 
                     error_info.setText("未识别的指纹!");
-                    error_info.setVisibility(error_info.VISIBLE);
+                    error_info.setVisibility(View.VISIBLE);
                     break;
             }
 
@@ -460,32 +462,32 @@ public class ManagerActivity extends AppCompatActivity {
         //writeTxtToFile("666666", filePath, fileName);
         readFile(filePath, fileName);
 
-         input_1 = (TextView) findViewById(R.id.manage_input_1);
-         input_2 = (TextView) findViewById(R.id.manage_input_2);
-         input_3 = (TextView) findViewById(R.id.manage_input_3);
-         input_4 = (TextView) findViewById(R.id.manage_input_4);
-         input_5 = (TextView) findViewById(R.id.manage_input_5);
-         input_6 = (TextView) findViewById(R.id.manage_input_6);
-         error_info = (TextView) findViewById(R.id.manage_error);
+         input_1 = findViewById(R.id.manage_input_1);
+         input_2 = findViewById(R.id.manage_input_2);
+         input_3 = findViewById(R.id.manage_input_3);
+         input_4 = findViewById(R.id.manage_input_4);
+         input_5 = findViewById(R.id.manage_input_5);
+         input_6 = findViewById(R.id.manage_input_6);
+         error_info = findViewById(R.id.manage_error);
 
-        Button input_00_Button = (Button) findViewById(R.id.manage_digit_00);
-        Button input_01_Button = (Button) findViewById(R.id.manage_digit_01);
-        Button input_02_Button = (Button) findViewById(R.id.manage_digit_02);
-        Button input_03_Button = (Button) findViewById(R.id.manage_digit_03);
-        Button input_04_Button = (Button) findViewById(R.id.manage_digit_04);
-        Button input_05_Button = (Button) findViewById(R.id.manage_digit_05);
-        Button input_06_Button = (Button) findViewById(R.id.manage_digit_06);
-        Button input_07_Button = (Button) findViewById(R.id.manage_digit_07);
-        Button input_08_Button = (Button) findViewById(R.id.manage_digit_08);
-        Button input_09_Button = (Button) findViewById(R.id.manage_digit_09);
-        Button manage_del_button = (Button) findViewById(R.id.manage_del_button);
-        Button manage_return_button = (Button) findViewById(R.id.manage_ruturn);
-        manage_finger = (Button) findViewById(R.id.manager_finger_button);
-        manage_open_lock = (Button) findViewById(R.id.manager_open_lock_button);
-        manage_function = (Button) findViewById(R.id.manager_function_button);
-        manage_finger_txt = (Button) findViewById(R.id.manager_finger_txt);
-        manage_open_lock_txt = (Button) findViewById(R.id.manager_lock_txt);
-        manage_function_txt = (Button) findViewById(R.id.manage_function_txt);
+        Button input_00_Button = findViewById(R.id.manage_digit_00);
+        Button input_01_Button = findViewById(R.id.manage_digit_01);
+        Button input_02_Button = findViewById(R.id.manage_digit_02);
+        Button input_03_Button = findViewById(R.id.manage_digit_03);
+        Button input_04_Button = findViewById(R.id.manage_digit_04);
+        Button input_05_Button = findViewById(R.id.manage_digit_05);
+        Button input_06_Button = findViewById(R.id.manage_digit_06);
+        Button input_07_Button = findViewById(R.id.manage_digit_07);
+        Button input_08_Button = findViewById(R.id.manage_digit_08);
+        Button input_09_Button = findViewById(R.id.manage_digit_09);
+        Button manage_del_button = findViewById(R.id.manage_del_button);
+        Button manage_return_button = findViewById(R.id.manage_ruturn);
+        manage_finger = findViewById(R.id.manager_finger_button);
+        manage_open_lock = findViewById(R.id.manager_open_lock_button);
+        manage_function = findViewById(R.id.manager_function_button);
+        manage_finger_txt = findViewById(R.id.manager_finger_txt);
+        manage_open_lock_txt = findViewById(R.id.manager_lock_txt);
+        manage_function_txt = findViewById(R.id.manage_function_txt);
         // 3.设置按钮点击事件
         input_00_Button.setOnClickListener(onClickListener);
         input_01_Button.setOnClickListener(onClickListener);
@@ -641,25 +643,25 @@ public class ManagerActivity extends AppCompatActivity {
             }
 
             //输入框显示*号
-            input_1.setVisibility(input_1.INVISIBLE);
-            input_2.setVisibility(input_2.INVISIBLE);
-            input_3.setVisibility(input_3.INVISIBLE);
-            input_4.setVisibility(input_4.INVISIBLE);
-            input_5.setVisibility(input_5.INVISIBLE);
-            input_6.setVisibility(input_6.INVISIBLE);
+            input_1.setVisibility(View.INVISIBLE);
+            input_2.setVisibility(View.INVISIBLE);
+            input_3.setVisibility(View.INVISIBLE);
+            input_4.setVisibility(View.INVISIBLE);
+            input_5.setVisibility(View.INVISIBLE);
+            input_6.setVisibility(View.INVISIBLE);
             switch(inputCnt){
                 case 6:
-                    input_6.setVisibility(input_6.VISIBLE);
+                    input_6.setVisibility(View.VISIBLE);
                 case 5:
-                    input_5.setVisibility(input_5.VISIBLE);
+                    input_5.setVisibility(View.VISIBLE);
                 case 4:
-                    input_4.setVisibility(input_4.VISIBLE);
+                    input_4.setVisibility(View.VISIBLE);
                 case 3:
-                    input_3.setVisibility(input_3.VISIBLE);
+                    input_3.setVisibility(View.VISIBLE);
                 case 2:
-                    input_2.setVisibility(input_2.VISIBLE);
+                    input_2.setVisibility(View.VISIBLE);
                 case 1:
-                    input_1.setVisibility(input_1.VISIBLE);
+                    input_1.setVisibility(View.VISIBLE);
                     break;
                 default:
                     break;
@@ -668,11 +670,11 @@ public class ManagerActivity extends AppCompatActivity {
             if(inputCnt == 6){
                 if (!inputNum.equals(g_passwd)) {
                     error_info.setText("密码错误!");
-                    error_info.setVisibility(error_info.VISIBLE);
+                    error_info.setVisibility(View.VISIBLE);
                 }
                 else{ //密码正确.
                     error_info.setText("密码正确!");
-                    error_info.setVisibility(error_info.VISIBLE);
+                    error_info.setVisibility(View.VISIBLE);
                     passwdState = true;
 
                     manage_finger.setClickable(true);
@@ -689,7 +691,7 @@ public class ManagerActivity extends AppCompatActivity {
                 }
             }
             else{
-                error_info.setVisibility(error_info.INVISIBLE);
+                error_info.setVisibility(View.INVISIBLE);
 
                 manage_finger.setClickable(false);
                 manage_open_lock.setClickable(false);

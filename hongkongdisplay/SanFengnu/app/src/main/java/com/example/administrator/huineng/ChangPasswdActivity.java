@@ -1,15 +1,8 @@
 
-package com.example.administrator.sanfengnu;
+package com.example.administrator.huineng;
 
-import android.annotation.SuppressLint;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -18,20 +11,16 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.administrator.huineng.R;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -107,18 +96,18 @@ public class ChangPasswdActivity extends AppCompatActivity {
 
         //readFile(filePath, fileName);
 
-        input_00_Button = (Button) findViewById(R.id.chpasswd_digit_00);
-        input_01_Button = (Button) findViewById(R.id.chpasswd_digit_01);
-        input_02_Button = (Button) findViewById(R.id.chpasswd_digit_02);
-        input_03_Button = (Button) findViewById(R.id.chpasswd_digit_03);
-        input_04_Button = (Button) findViewById(R.id.chpasswd_digit_04);
-        input_05_Button = (Button) findViewById(R.id.chpasswd_digit_05);
-        input_06_Button = (Button) findViewById(R.id.chpasswd_digit_06);
-        input_07_Button = (Button) findViewById(R.id.chpasswd_digit_07);
-        input_08_Button = (Button) findViewById(R.id.chpasswd_digit_08);
-        input_09_Button = (Button) findViewById(R.id.chpasswd_digit_09);
-        passwd_del_button = (Button) findViewById(R.id.chpasswd_del_button);
-        Button passwd_return_button = (Button) findViewById(R.id.chpasswd_ruturn);
+        input_00_Button = findViewById(R.id.chpasswd_digit_00);
+        input_01_Button = findViewById(R.id.chpasswd_digit_01);
+        input_02_Button = findViewById(R.id.chpasswd_digit_02);
+        input_03_Button = findViewById(R.id.chpasswd_digit_03);
+        input_04_Button = findViewById(R.id.chpasswd_digit_04);
+        input_05_Button = findViewById(R.id.chpasswd_digit_05);
+        input_06_Button = findViewById(R.id.chpasswd_digit_06);
+        input_07_Button = findViewById(R.id.chpasswd_digit_07);
+        input_08_Button = findViewById(R.id.chpasswd_digit_08);
+        input_09_Button = findViewById(R.id.chpasswd_digit_09);
+        passwd_del_button = findViewById(R.id.chpasswd_del_button);
+        Button passwd_return_button = findViewById(R.id.chpasswd_ruturn);
 
         // 3.设置按钮点击事件
         input_00_Button.setOnClickListener(onClickListener);
@@ -134,13 +123,13 @@ public class ChangPasswdActivity extends AppCompatActivity {
         passwd_del_button.setOnClickListener(onClickListener);
         passwd_return_button.setOnClickListener(onClickListener);
 
-        input_1 = (TextView)findViewById(R.id.chpasswd_input_1);
-        input_2 = (TextView)findViewById(R.id.chpasswd_input_2);
-        input_3 = (TextView)findViewById(R.id.chpasswd_input_3);
-        input_4 = (TextView)findViewById(R.id.chpasswd_input_4);
-        input_5 = (TextView)findViewById(R.id.chpasswd_input_5);
-        input_6 = (TextView)findViewById(R.id.chpasswd_input_6);
-        error_info  = (TextView)findViewById(R.id.chpasswd_error);
+        input_1 = findViewById(R.id.chpasswd_input_1);
+        input_2 = findViewById(R.id.chpasswd_input_2);
+        input_3 = findViewById(R.id.chpasswd_input_3);
+        input_4 = findViewById(R.id.chpasswd_input_4);
+        input_5 = findViewById(R.id.chpasswd_input_5);
+        input_6 = findViewById(R.id.chpasswd_input_6);
+        error_info  = findViewById(R.id.chpasswd_error);
 
         Timer timer_delay = new Timer();
         timer_delay.schedule(tick_task, 1, 1);//1ms后执行Tick   1ms 的tick
@@ -262,25 +251,25 @@ public class ChangPasswdActivity extends AppCompatActivity {
             }
 
             //输入框显示*号
-            input_1.setVisibility(input_1.INVISIBLE);
-            input_2.setVisibility(input_2.INVISIBLE);
-            input_3.setVisibility(input_3.INVISIBLE);
-            input_4.setVisibility(input_4.INVISIBLE);
-            input_5.setVisibility(input_5.INVISIBLE);
-            input_6.setVisibility(input_6.INVISIBLE);
+            input_1.setVisibility(View.INVISIBLE);
+            input_2.setVisibility(View.INVISIBLE);
+            input_3.setVisibility(View.INVISIBLE);
+            input_4.setVisibility(View.INVISIBLE);
+            input_5.setVisibility(View.INVISIBLE);
+            input_6.setVisibility(View.INVISIBLE);
             switch(inputCnt){
                 case 6:
-                    input_6.setVisibility(input_6.VISIBLE);
+                    input_6.setVisibility(View.VISIBLE);
                 case 5:
-                    input_5.setVisibility(input_5.VISIBLE);
+                    input_5.setVisibility(View.VISIBLE);
                 case 4:
-                    input_4.setVisibility(input_4.VISIBLE);
+                    input_4.setVisibility(View.VISIBLE);
                 case 3:
-                    input_3.setVisibility(input_3.VISIBLE);
+                    input_3.setVisibility(View.VISIBLE);
                 case 2:
-                    input_2.setVisibility(input_2.VISIBLE);
+                    input_2.setVisibility(View.VISIBLE);
                 case 1:
-                    input_1.setVisibility(input_1.VISIBLE);
+                    input_1.setVisibility(View.VISIBLE);
                     break;
                 default:
                     break;
@@ -288,12 +277,12 @@ public class ChangPasswdActivity extends AppCompatActivity {
 
             if(inputCnt == 6){
                 //输入框不显示*号
-                input_1.setVisibility(input_1.INVISIBLE);
-                input_2.setVisibility(input_2.INVISIBLE);
-                input_3.setVisibility(input_3.INVISIBLE);
-                input_4.setVisibility(input_4.INVISIBLE);
-                input_5.setVisibility(input_5.INVISIBLE);
-                input_6.setVisibility(input_6.INVISIBLE);
+                input_1.setVisibility(View.INVISIBLE);
+                input_2.setVisibility(View.INVISIBLE);
+                input_3.setVisibility(View.INVISIBLE);
+                input_4.setVisibility(View.INVISIBLE);
+                input_5.setVisibility(View.INVISIBLE);
+                input_6.setVisibility(View.INVISIBLE);
                 inputCnt = 0;
 
                 if(passwd_cnt == 0) //第一次密码输入
@@ -438,7 +427,7 @@ public class ChangPasswdActivity extends AppCompatActivity {
 
     // 生成文件夹
     public static void makeRootDirectory(String filePath) {
-        File file = null;
+        File file;
         try {
             file = new File(filePath);
             if (!file.exists()) {

@@ -1,4 +1,4 @@
-package com.example.administrator.sanfengnu;
+package com.example.administrator.huineng;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -12,6 +12,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+
+import com.example.administrator.huineng.R;
 
 public class ConfileActivity extends AppCompatActivity {
 
@@ -55,7 +57,7 @@ public class ConfileActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_confile);
 
-        Button confile_tryWearButton = (Button) findViewById(R.id.confile_tryWearButton2);
+        Button confile_tryWearButton = findViewById(R.id.confile_tryWearButton2);
         confile_tryWearButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
 
@@ -70,7 +72,7 @@ public class ConfileActivity extends AppCompatActivity {
             }
         });
 
-        Button confile_return = (Button) findViewById(R.id.confile_return_button);
+        Button confile_return = findViewById(R.id.confile_return_button);
         confile_return.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 //清理返回
@@ -79,7 +81,7 @@ public class ConfileActivity extends AppCompatActivity {
         });
 
         String myJpgPath =  "/mnt/sdcard/SanFeng/image/h1.jpg";
-        ImageView jpgView= (ImageView)findViewById(R.id.glass_info);
+        ImageView jpgView= findViewById(R.id.glass_info);
         switch (glass_num)
         {
             case 0:

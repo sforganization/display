@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HongKong">
+    tools:context="com.example.administrator.huineng.HongKong">
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/frameLayout10"
@@ -51,12 +51,23 @@
             android:id="@+id/Hongkong2_down"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="80dp"
+            android:layout_marginTop="100dp"
             android:background="@drawable/trywear"
             android:textSize="32dp"
             android:text="下降"
             app:layout_constraintStart_toStartOf="@+id/Hongkong2_up"
             app:layout_constraintTop_toBottomOf="@+id/Hongkong2_up" />
+
+        <Button
+            android:id="@+id/Hongkong2_lock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="100dp"
+            android:background="@drawable/trywear"
+            android:textSize="32dp"
+            android:text="开锁"
+            app:layout_constraintStart_toStartOf="@+id/Hongkong2_down"
+            app:layout_constraintTop_toBottomOf="@+id/Hongkong2_down" />
 
         <include
             android:id="@+id/Hongkong3_mode"
@@ -81,24 +92,12 @@
             app:layout_constraintTop_toBottomOf="@+id/Hongkong1_trun" />
 
         <include
-            android:id="@+id/hongkong2_lock"
-            layout="@layout/include_lock"
-            android:layout_width="109dp"
-            android:layout_height="109dp"
-            android:layout_marginStart="50dp"
-            android:layout_marginLeft="50dp"
-            android:layout_marginTop="100dp"
-            app:layout_constraintStart_toStartOf="@+id/Hongkong2_down"
-            app:layout_constraintTop_toBottomOf="@+id/Hongkong2_down" />
-
-        <include
             android:id="@+id/hongkong3_lock"
             layout="@layout/include_lock"
             android:layout_width="109dp"
             android:layout_height="109dp"
-            android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toBottomOf="@+id/hongkong2_lock"
-            app:layout_constraintStart_toStartOf="@+id/Hongkong3_mode" />
+            app:layout_constraintStart_toStartOf="@+id/Hongkong3_mode"
+            app:layout_constraintTop_toTopOf="@+id/hongkong1_lock" />
 
         <ProgressBar
             android:id="@+id/hongkong1_process"
@@ -112,18 +111,6 @@
             app:layout_constraintStart_toStartOf="@+id/hongkong1_lock"
             app:layout_constraintTop_toTopOf="@+id/hongkong1_lock" />
 
-
-        <ProgressBar
-            android:id="@+id/hongkong2_process"
-            android:layout_width="128dp"
-            android:layout_height="128dp"
-            android:clickable="false"
-            android:indeterminateDrawable="@drawable/loading"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="@+id/hongkong2_lock"
-            app:layout_constraintEnd_toEndOf="@+id/hongkong2_lock"
-            app:layout_constraintStart_toStartOf="@+id/hongkong2_lock"
-            app:layout_constraintTop_toTopOf="@+id/hongkong2_lock" />
 
         <ProgressBar
             android:id="@+id/hongkong3_process"

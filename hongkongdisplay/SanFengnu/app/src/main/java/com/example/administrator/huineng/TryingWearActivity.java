@@ -1,11 +1,9 @@
 
-package com.example.administrator.sanfengnu;
+package com.example.administrator.huineng;
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,9 +13,9 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
+
+import com.example.administrator.huineng.R;
 
 import java.io.File;
 import java.io.IOException;
@@ -103,13 +101,13 @@ public class TryingWearActivity extends AppCompatActivity {
         //装填信息
         //时间数据包之前的信息
         terimalPackage[0] = (byte)0xAA;			   //包头
-        terimalPackage[1] = (byte)data[0];         //cmd 命令
-        terimalPackage[2] = (byte)data[1];         //参数0  地址，LED模式，增加删除指纹ID,
-        terimalPackage[3] = (byte)data[2];         //
-        terimalPackage[4] = (byte)data[3];         //
-        terimalPackage[5] = (byte)data[4];         //数据  （锁开关 + 方向 + 时间）
-        terimalPackage[6] = (byte)data[5];         //
-        terimalPackage[7] = (byte)data[6];         //
+        terimalPackage[1] = data[0];         //cmd 命令
+        terimalPackage[2] = data[1];         //参数0  地址，LED模式，增加删除指纹ID,
+        terimalPackage[3] = data[2];         //
+        terimalPackage[4] = data[3];         //
+        terimalPackage[5] = data[4];         //数据  （锁开关 + 方向 + 时间）
+        terimalPackage[6] = data[5];         //
+        terimalPackage[7] = data[6];         //
 
         //计算校验和
         //转化为无符号进行校验
@@ -193,7 +191,7 @@ public class TryingWearActivity extends AppCompatActivity {
         checkSum = 0;
         for(i = 0 ; i < 53; i++) //和校验
         {
-            checkSum += (byte)recvArry[index + i];
+            checkSum += recvArry[index + i];
         }
 
         if(checkSum != (byte)0x55 - 1)
@@ -317,13 +315,13 @@ public class TryingWearActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_trying_wear);
 
-        open_lock = (Button) findViewById(R.id.try_open_lock_button);
-        trun_on = (Button) findViewById(R.id.try_trun_moto_button);
-        try_return = (Button) findViewById(R.id.try_return);
-        process_bar = (ProgressBar)findViewById(R.id.try_process_bar);
+        open_lock = findViewById(R.id.try_open_lock_button);
+        trun_on = findViewById(R.id.try_trun_moto_button);
+        try_return = findViewById(R.id.try_return);
+        process_bar = findViewById(R.id.try_process_bar);
 
-        bottom_cicle = ( Button) findViewById(R.id.try_bottom_circle);
-        top_cicle = ( Button) findViewById(R.id.try_top_circle);
+        bottom_cicle = findViewById(R.id.try_bottom_circle);
+        top_cicle = findViewById(R.id.try_top_circle);
 
         // 3.设置按钮点击事件
         open_lock.setOnClickListener(onClickListener);

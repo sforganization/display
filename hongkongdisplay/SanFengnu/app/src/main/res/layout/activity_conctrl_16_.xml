@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Conctrl_16_Activity">
+    tools:context="com.example.administrator.huineng.Conctrl_16_Activity">
 
 
     <android.support.constraint.ConstraintLayout
